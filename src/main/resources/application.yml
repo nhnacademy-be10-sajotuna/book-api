@@ -1,10 +1,14 @@
 spring:
   application:
     name: book-api
-  datasource:
-    url: jdbc:mysql://10.116.64.14:13306/nhn_academy_4?serverTimezone=Asia/Seoul
-    username: project_be10_team4
-    password: uEUklnkbk*7*_O4H
+    datasource:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+      h2:
+        console:
+          enabled: true
   jpa:
     hibernate:
       ddl-auto: update
