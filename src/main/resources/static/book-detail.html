@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>책 상세 정보</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    h1 { color: #333; text-align: center; margin-bottom: 20px; }
+    .book-details { display: flex; gap: 20px; margin-bottom: 20px; }
+    .book-image { flex: 0 0 200px; text-align: center; }
+    .book-image img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+    .book-info { flex-grow: 1; }
+    .book-info p { margin: 5px 0; line-height: 1.6; }
+    .book-info strong { display: inline-block; width: 100px; color: #555; }
+    .description-box, .toc-box {
+      background-color: #f9f9f9;
+      border: 1px solid #eee;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      white-space: pre-wrap; /* 줄바꿈 유지 */
+      font-size: 0.95em;
+    }
+    .description-box h3, .toc-box h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    .back-button {
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+      text-decoration: none;
+    }
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+    .price-info { font-size: 1.1em; }
+    .original-price { text-decoration: line-through; color: #888; margin-right: 10px; }
+    .selling-price { font-weight: bold; color: #dc3545; }
+    .discount-rate { color: #28a745; font-weight: bold; margin-left: 10px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1 id="bookTitle">책 상세 정보 로딩 중...</h1>
+  <div class="book-details">
+    <div class="book-image">
+      <img id="bookImage" src="" alt="책 표지" onerror="this.onerror=null;this.src='https://via.placeholder.com/200x300?text=No+Image';">
+    </div>
+    <div class="book-info">
+      <p><strong>ISBN:</strong> <span id="bookIsbn"></span></p>
+      <p><strong>작가:</strong> <span id="bookAuthor"></span></p>
+      <p><strong>출판사:</strong> <span id="bookPublisher"></span></p>
+      <p><strong>출판일:</strong> <span id="bookPublicationDate"></span></p>
+      <p><strong>페이지 수:</strong> <span id="bookPageCount"></span></p>
+      <p><strong>정가:</strong> <span id="bookOriginalPrice" class="original-price"></span></p>
+      <p><strong>판매가:</strong> <span id="bookSellingPrice" class="selling-price"></span>
+        <span id="bookDiscountRate" class="discount-rate"></span></p>
+      <p><strong>선물 포장:</strong> <span id="bookGiftWrapping"></span></p>
+      <p><strong>좋아요:</strong> <span id="bookLikes"></span></p>
+      <p><strong>카테고리:</strong> <span id="bookCategories"></span></p>
+      <p><strong>태그:</strong> <span id="bookTags"></span></p>
+    </div>
+  </div>
+
+  <div class="description-box">
+    <h3>책 설명</h3>
+    <p id="bookDescription"></p>
+  </div>
+
+  <div class="toc-box">
+    <h3>책 목차</h3>
+    <p id="bookTableOfContents"></p>
+  </div>
+
+  <a href="/" class="back-button">목록으로 돌아가기</a>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const isbn = params.get('isbn');
+
+    if (isbn) {
+      loadBookDetails(isbn);
+    } else {
+      document.getElementById('bookTitle').textContent = '오류: ISBN이 제공되지 않았습니다.';
+      document.querySelector('.container').innerHTML = '<h1>책 정보를 찾을 수 없습니다.</h1><p>유효한 ISBN으로 접속해주세요.</p><a href="/" class="back-button">목록으로 돌아가기</a>';
+    }
+  });
+
+  async function loadBookDetails(isbn) {
+    try {
+      const response = await fetch(`http://localhost:8080/api/books/${isbn}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          document.getElementById('bookTitle').textContent = '책을 찾을 수 없습니다.';
+          document.querySelector('.container').innerHTML = `<h1>ISBN: ${isbn} 에 해당하는 책을 찾을 수 없습니다.</h1><p>데이터베이스에 존재하지 않는 책일 수 있습니다.</p><a href="/" class="back-button">목록으로 돌아가기</a>`;
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const book = await response.json();
+
+      document.getElementById('bookTitle').textContent = book.title;
+      document.getElementById('bookImage').src = book.imageUrl || 'https://via.placeholder.com/200x300?text=No+Image'; // 이미지가 없으면 대체 이미지
+      document.getElementById('bookIsbn').textContent = book.isbn;
+      document.getElementById('bookAuthor').textContent = book.author;
+      document.getElementById('bookPublisher').textContent = book.publisher;
+      document.getElementById('bookPublicationDate').textContent = book.publicationDate;
+      document.getElementById('bookPageCount').textContent = book.pageCount + ' 페이지';
+      document.getElementById('bookOriginalPrice').textContent = book.originalPrice.toLocaleString('ko-KR') + '원';
+      document.getElementById('bookSellingPrice').textContent = book.sellingPrice.toLocaleString('ko-KR') + '원';
+      document.getElementById('bookDiscountRate').textContent = `(${book.discountRate.toFixed(2)}% 할인)`;
+      document.getElementById('bookGiftWrapping').textContent = book.giftWrappingAvailable ? '가능' : '불가능';
+      document.getElementById('bookLikes').textContent = book.likes;
+      document.getElementById('bookCategories').textContent = book.categories.map(cat => cat.name).join(', ') || '없음';
+      document.getElementById('bookTags').textContent = book.tags.join(', ') || '없음';
+      document.getElementById('bookDescription').textContent = book.description;
+      document.getElementById('bookTableOfContents').textContent = book.tableOfContents;
+
+    } catch (error) {
+      console.error('책 상세 정보를 가져오는 중 오류 발생:', error);
+      document.getElementById('bookTitle').textContent = '정보를 가져올 수 없습니다.';
+      document.querySelector('.container').innerHTML = '<h1>오류 발생</h1><p>책 상세 정보를 가져오는 중 문제가 발생했습니다. 서버 상태를 확인해주세요.</p><a href="/" class="back-button">목록으로 돌아가기</a>';
+    }
+  }
+</script>
+</body>
+</html>
