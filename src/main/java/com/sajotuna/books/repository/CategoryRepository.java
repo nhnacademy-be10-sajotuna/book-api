@@ -1,6 +1,6 @@
-package com.nhnacademy.books.repository;
+package com.sajotuna.books.repository;
 
-import com.nhnacademy.books.model.Category;
+import com.sajotuna.books.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

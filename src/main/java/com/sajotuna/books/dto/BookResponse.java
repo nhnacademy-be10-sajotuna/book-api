@@ -1,6 +1,6 @@
-package com.nhnacademy.books.dto;
+package com.sajotuna.books.dto;
 
-import com.nhnacademy.books.model.Book;
+import com.sajotuna.books.model.Book;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

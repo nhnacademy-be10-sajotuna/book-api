@@ -1,6 +1,6 @@
-package com.nhnacademy.books.dto;
+package com.sajotuna.books.dto;
 
-import com.nhnacademy.books.model.Category; // Category 엔티티 임포트
+import com.sajotuna.books.model.Category; // Category 엔티티 임포트
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

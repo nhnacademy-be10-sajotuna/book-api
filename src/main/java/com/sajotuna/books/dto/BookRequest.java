@@ -1,4 +1,4 @@
-package com.nhnacademy.books.dto;
+package com.sajotuna.books.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

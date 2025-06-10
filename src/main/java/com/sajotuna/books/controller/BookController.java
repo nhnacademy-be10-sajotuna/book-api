@@ -1,11 +1,11 @@
-package com.nhnacademy.books.controller;
+package com.sajotuna.books.controller;
 
-import com.nhnacademy.books.dto.BookResponse;
-import com.nhnacademy.books.dto.CategoryRequest;
-import com.nhnacademy.books.dto.CategoryResponse;
-import com.nhnacademy.books.dto.BookRequest;
-import com.nhnacademy.books.service.BookService;
-import com.nhnacademy.books.service.CategoryService;
+import com.sajotuna.books.dto.BookResponse;
+import com.sajotuna.books.dto.CategoryRequest;
+import com.sajotuna.books.dto.CategoryResponse;
+import com.sajotuna.books.dto.BookRequest;
+import com.sajotuna.books.service.BookService;
+import com.sajotuna.books.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

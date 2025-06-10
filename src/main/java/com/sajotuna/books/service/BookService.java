@@ -1,7 +1,7 @@
-package com.nhnacademy.books.service;
+package com.sajotuna.books.service;
 
-import com.nhnacademy.books.dto.BookRequest;
-import com.nhnacademy.books.dto.BookResponse;
+import com.sajotuna.books.dto.BookRequest;
+import com.sajotuna.books.dto.BookResponse;
 
 import java.util.List;
 

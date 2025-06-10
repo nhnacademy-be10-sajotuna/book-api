@@ -1,10 +1,10 @@
-package com.nhnacademy.books.service.impl;
+package com.sajotuna.books.service.impl;
 
-import com.nhnacademy.books.dto.CategoryRequest;
-import com.nhnacademy.books.dto.CategoryResponse;
-import com.nhnacademy.books.model.Category;
-import com.nhnacademy.books.repository.CategoryRepository;
-import com.nhnacademy.books.service.CategoryService;
+import com.sajotuna.books.dto.CategoryRequest;
+import com.sajotuna.books.dto.CategoryResponse;
+import com.sajotuna.books.model.Category;
+import com.sajotuna.books.repository.CategoryRepository;
+import com.sajotuna.books.service.CategoryService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

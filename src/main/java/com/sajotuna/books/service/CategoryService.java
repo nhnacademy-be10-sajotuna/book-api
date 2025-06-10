@@ -1,7 +1,7 @@
-package com.nhnacademy.books.service;
+package com.sajotuna.books.service;
 
-import com.nhnacademy.books.dto.CategoryRequest; // 추가
-import com.nhnacademy.books.dto.CategoryResponse; // 추가
+import com.sajotuna.books.dto.CategoryRequest; // 추가
+import com.sajotuna.books.dto.CategoryResponse; // 추가
 
 import java.util.List;
 

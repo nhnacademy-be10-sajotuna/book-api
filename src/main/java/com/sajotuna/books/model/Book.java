@@ -1,4 +1,4 @@
-package com.nhnacademy.books.model;
+package com.sajotuna.books.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
