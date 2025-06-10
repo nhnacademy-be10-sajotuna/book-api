@@ -24,9 +24,7 @@ public class Book {
     @Column(name = "book_index", nullable = false)
     private String bookIndex; // 목차
 
-    // @Lob 어노테이션은 CLOB/BLOB 타입에 매핑됩니다.
-    @Lob
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Column(name = "author", nullable = false)
@@ -53,18 +51,19 @@ public class Book {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    // Book 엔티티와 Category 엔티티 간의 다대다 관계
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "book_categories",
-            joinColumns = @JoinColumn(name = "book_isbn"),
+            name = "book_category",
+            joinColumns = @JoinColumn(name = "isbn"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
 
-    // Book 엔티티와 Tag (단순 문자열) 간의 관계
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "book_tags", joinColumns = @JoinColumn(name = "book_isbn"))
-    @Column(name = "tag")
-    private Set<String> tags = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "book_tag",
+            joinColumns = @JoinColumn(name = "isbn"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 }
