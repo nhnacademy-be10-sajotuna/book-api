@@ -1,5 +1,7 @@
 package com.nhnacademy.books.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference; // 추가
+import com.fasterxml.jackson.annotation.JsonManagedReference; // 추가
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,16 +9,16 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
-import java.util.HashSet; // HashSet 추가
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set; // Set 추가
+import java.util.Set;
 
 @Entity
 @Table(name = "categories")
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(exclude = {"subCategories", "books"}) // 순환 참조 방지, books 필드도 exclude에 추가
+@ToString(exclude = {"subCategories", "books"})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,17 +27,18 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY) // 상위 카테고리는 지연 로딩
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonBackReference // !!!!!!!! 이 부분 추가 !!!!!!!!
     private Category parentCategory;
 
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // !!!!!!!! 이 부분 추가 !!!!!!!!
     private List<Category> subCategories = new ArrayList<>();
 
-    // !!!!!!!! 이 부분을 추가해야 합니다 !!!!!!!!
-    @ManyToMany(mappedBy = "categories") // Book 엔티티의 'categories' 필드에 의해 매핑됨을 명시
+    @ManyToMany(mappedBy = "categories")
+    @JsonBackReference // !!!!!!!! 이 부분 추가 (Book의 categories 필드에 대한 역참조) !!!!!!!!
     private Set<Book> books = new HashSet<>();
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     public Category(String name) {
         this.name = name;
@@ -45,17 +48,15 @@ public class Category {
         this.name = name;
         this.parentCategory = parentCategory;
         if (parentCategory != null) {
-            parentCategory.addSubCategory(this); // 상위 카테고리에 하위 카테고리 추가
+            parentCategory.addSubCategory(this);
         }
     }
 
-    // 편의 메서드: 상위 카테고리에 하위 카테고리 추가
     public void addSubCategory(Category category) {
         this.subCategories.add(category);
         category.setParentCategory(this);
     }
 
-    // 카테고리 경로를 문자열로 반환
     public String getFullPath() {
         if (parentCategory != null) {
             return parentCategory.getFullPath() + " > " + name;

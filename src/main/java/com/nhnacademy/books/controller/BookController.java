@@ -1,5 +1,7 @@
 package com.nhnacademy.books.controller;
 
+import com.nhnacademy.books.dto.BookResponse; // 추가
+import com.nhnacademy.books.dto.CategoryResponse; // 추가
 import com.nhnacademy.books.model.Book;
 import com.nhnacademy.books.model.Category;
 import com.nhnacademy.books.service.BookService;
@@ -18,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/books") // 모든 API 엔드포인트에 /api/books 접두사
+@RequestMapping("/api/books")
 public class BookController {
 
     private final BookService bookService;
@@ -31,7 +33,7 @@ public class BookController {
 
     // 새 도서 등록 (POST /api/books)
     @PostMapping
-    public ResponseEntity<Book> registerBook(@RequestBody BookRegisterRequest request) {
+    public ResponseEntity<BookResponse> registerBook(@RequestBody BookRegisterRequest request) {
         try {
             Book registeredBook = bookService.registerBook(
                     request.getIsbn(),
@@ -45,44 +47,53 @@ public class BookController {
                     request.getCategoryIds(),
                     request.getTags()
             );
-            return new ResponseEntity<>(registeredBook, HttpStatus.CREATED); // 201 Created
+            return new ResponseEntity<>(new BookResponse(registeredBook), HttpStatus.CREATED); // DTO로 변환하여 반환
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); // 400 Bad Request
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
     // 모든 도서 조회 (GET /api/books)
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
+    public ResponseEntity<List<BookResponse>> getAllBooks() {
         List<Book> books = bookService.getAllBooks();
-        return new ResponseEntity<>(books, HttpStatus.OK); // 200 OK
+        List<BookResponse> bookResponses = books.stream()
+                .map(BookResponse::new) // Book 엔티티를 BookResponse DTO로 변환
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(bookResponses, HttpStatus.OK);
     }
 
     // ISBN으로 도서 조회 (GET /api/books/{isbn})
     @GetMapping("/{isbn}")
-    public ResponseEntity<Book> getBookByIsbn(@PathVariable String isbn) {
+    public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
         Optional<Book> book = bookService.getBookByIsbn(isbn);
-        return book.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND)); // 404 Not Found
+        return book.map(value -> new ResponseEntity<>(new BookResponse(value), HttpStatus.OK)) // DTO로 변환하여 반환
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // 제목으로 도서 검색 (GET /api/books/search/title?keyword=...)
     @GetMapping("/search/title")
-    public ResponseEntity<List<Book>> searchBooksByTitle(@RequestParam String keyword) {
+    public ResponseEntity<List<BookResponse>> searchBooksByTitle(@RequestParam String keyword) {
         List<Book> books = bookService.searchBooksByTitle(keyword);
-        return new ResponseEntity<>(books, HttpStatus.OK);
+        List<BookResponse> bookResponses = books.stream()
+                .map(BookResponse::new)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(bookResponses, HttpStatus.OK);
     }
 
     // 저자로 도서 검색 (GET /api/books/search/author?keyword=...)
     @GetMapping("/search/author")
-    public ResponseEntity<List<Book>> searchBooksByAuthor(@RequestParam String keyword) {
+    public ResponseEntity<List<BookResponse>> searchBooksByAuthor(@RequestParam String keyword) {
         List<Book> books = bookService.searchBooksByAuthor(keyword);
-        return new ResponseEntity<>(books, HttpStatus.OK);
+        List<BookResponse> bookResponses = books.stream()
+                .map(BookResponse::new)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(bookResponses, HttpStatus.OK);
     }
 
     // 도서 정보 업데이트 (PUT /api/books/{isbn})
     @PutMapping("/{isbn}")
-    public ResponseEntity<Book> updateBook(@PathVariable String isbn, @RequestBody BookUpdateRequest request) {
+    public ResponseEntity<BookResponse> updateBook(@PathVariable String isbn, @RequestBody BookUpdateRequest request) {
         try {
             Book updatedBook = bookService.updateBookDetails(
                     isbn,
@@ -98,9 +109,9 @@ public class BookController {
                     request.getCategoryIds(),
                     request.getTags()
             );
-            return new ResponseEntity<>(updatedBook, HttpStatus.OK); // 200 OK
+            return new ResponseEntity<>(new BookResponse(updatedBook), HttpStatus.OK); // DTO로 변환하여 반환
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND); // 404 Not Found (또는 400 Bad Request)
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -109,9 +120,9 @@ public class BookController {
     public ResponseEntity<Void> deleteBook(@PathVariable String isbn) {
         try {
             bookService.deleteBook(isbn);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404 Not Found
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -139,19 +150,22 @@ public class BookController {
 
     // 카테고리 관련 API (간단하게)
     @PostMapping("/categories")
-    public ResponseEntity<Category> createCategory(@RequestBody CategoryCreateRequest request) {
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryCreateRequest request) {
         try {
             Category category = categoryService.createCategory(request.getName(), request.getParentId());
-            return new ResponseEntity<>(category, HttpStatus.CREATED);
+            return new ResponseEntity<>(new CategoryResponse(category), HttpStatus.CREATED); // DTO로 변환하여 반환
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
-        return new ResponseEntity<>(categories, HttpStatus.OK);
+        List<CategoryResponse> categoryResponses = categories.stream()
+                .map(CategoryResponse::new) // Category 엔티티를 CategoryResponse DTO로 변환
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(categoryResponses, HttpStatus.OK);
     }
 }
 
