@@ -1,11 +1,14 @@
+// src/main/java/com/sajotuna/books/service/impl/BookServiceImpl.java
 package com.sajotuna.books.service.impl;
 
 import com.sajotuna.books.dto.BookRequest;
 import com.sajotuna.books.dto.BookResponse;
 import com.sajotuna.books.model.Book;
 import com.sajotuna.books.model.Category;
+import com.sajotuna.books.model.Tag; // Tag 엔티티 임포트
 import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.CategoryRepository;
+import com.sajotuna.books.repository.TagRepository; // TagRepository 임포트
 import com.sajotuna.books.service.BookService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -20,10 +23,12 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository; // TagRepository 주입
 
-    public BookServiceImpl(BookRepository bookRepository, CategoryRepository categoryRepository) {
+    public BookServiceImpl(BookRepository bookRepository, CategoryRepository categoryRepository, TagRepository tagRepository) {
         this.bookRepository = bookRepository;
         this.categoryRepository = categoryRepository;
+        this.tagRepository = tagRepository; // 주입
     }
 
     @Override
@@ -34,10 +39,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse getBookByIsbn(String isbn) { // 구현 추가
+    public BookResponse getBookByIsbn(String isbn) {
         return bookRepository.findById(isbn)
                 .map(BookResponse::new)
-                .orElse(null); // 책이 없으면 null 반환 (컨트롤러에서 404 처리)
+                .orElse(null);
     }
 
     @Override
@@ -48,8 +53,8 @@ public class BookServiceImpl implements BookService {
                 bookRequest.getAuthor(),
                 bookRequest.getPublisher(),
                 bookRequest.getPublicationDate(),
-                bookRequest.getPageCount(), // 추가
-                bookRequest.getImageUrl(), // 추가
+                bookRequest.getPageCount(),
+                bookRequest.getImageUrl(),
                 bookRequest.getDescription(),
                 bookRequest.getTableOfContents(),
                 bookRequest.getOriginalPrice(),
@@ -58,7 +63,7 @@ public class BookServiceImpl implements BookService {
                 bookRequest.getLikes()
         );
 
-        // 카테고리 설정
+        // 카테고리 설정 (기존과 동일)
         if (bookRequest.getCategoryIds() != null && !bookRequest.getCategoryIds().isEmpty()) {
             Set<Category> categories = bookRequest.getCategoryIds().stream()
                     .map(categoryRepository::findById)
@@ -68,9 +73,14 @@ public class BookServiceImpl implements BookService {
             book.setCategories(categories);
         }
 
-        // 태그 설정
-        if (bookRequest.getTags() != null) {
-            book.setTags(bookRequest.getTags());
+        // 태그 설정 (Tag 엔티티 사용하도록 변경)
+        if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
+            Set<Tag> tags = bookRequest.getTagIds().stream()
+                    .map(tagRepository::findById) // ID로 Tag 엔티티 조회
+                    .filter(java.util.Optional::isPresent)
+                    .map(java.util.Optional::get)
+                    .collect(Collectors.toSet());
+            book.setTags(tags);
         }
 
         Book savedBook = bookRepository.save(book);

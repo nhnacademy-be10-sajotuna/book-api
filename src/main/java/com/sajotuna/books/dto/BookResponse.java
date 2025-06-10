@@ -1,3 +1,4 @@
+// src/main/java/com/sajotuna/books/dto/BookResponse.java
 package com.sajotuna.books.dto;
 
 import com.sajotuna.books.model.Book;
@@ -18,17 +19,17 @@ public class BookResponse {
     private String author;
     private String publisher;
     private LocalDate publicationDate;
-    private Integer pageCount; // 추가: 페이지 수
-    private String imageUrl; // 추가: 이미지 URL
+    private Integer pageCount;
+    private String imageUrl;
     private String description;
     private String tableOfContents;
     private Double originalPrice;
     private Double sellingPrice;
-    private Double discountRate; // 할인율은 계산된 값
+    private Double discountRate;
     private Boolean giftWrappingAvailable;
     private Integer likes;
-    private List<CategoryResponse> categories; // 책에 연결된 카테고리
-    private List<String> tags; // 책에 연결된 태그
+    private List<CategoryResponse> categories;
+    private List<TagResponse> tags; // List<String>에서 List<TagResponse>로 변경
 
     public BookResponse(Book book) {
         this.isbn = book.getIsbn();
@@ -36,18 +37,20 @@ public class BookResponse {
         this.author = book.getAuthor();
         this.publisher = book.getPublisher();
         this.publicationDate = book.getPublicationDate();
-        this.pageCount = book.getPageCount(); // 추가
-        this.imageUrl = book.getImageUrl(); // 추가
+        this.pageCount = book.getPageCount();
+        this.imageUrl = book.getImageUrl();
         this.description = book.getDescription();
         this.tableOfContents = book.getTableOfContents();
         this.originalPrice = book.getOriginalPrice();
         this.sellingPrice = book.getSellingPrice();
-        this.discountRate = book.getDiscountRate(); // 계산된 값 사용
+        this.discountRate = book.getDiscountRate();
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
         this.categories = book.getCategories().stream()
                 .map(CategoryResponse::new)
                 .collect(Collectors.toList());
-        this.tags = book.getTags().stream().collect(Collectors.toList());
+        this.tags = book.getTags().stream() // Tag 엔티티를 TagResponse DTO로 변환
+                .map(TagResponse::new)
+                .collect(Collectors.toList());
     }
 }
