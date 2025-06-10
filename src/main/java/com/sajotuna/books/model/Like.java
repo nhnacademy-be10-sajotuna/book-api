@@ -17,13 +17,13 @@ public class Like {
     private String isbn;
 
     @Id
-    @Column(name = "member_id")
-    private Integer memberId;
+    @Column(name = "user_id")
+    private Integer userId;
 
     // Book 엔티티가 프로젝트 내에 있다면 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "isbn", referencedColumnName = "isbn", insertable = false, updatable = false)
     private Book book;
 
-    // Member 엔티티는 외부 시스템에 있으므로 직접 참조하지 않음
+    // User 엔티티는 외부 시스템에 있으므로 직접 참조하지 않음
 }

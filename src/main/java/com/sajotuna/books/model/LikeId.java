@@ -9,17 +9,17 @@ import lombok.*;
 @AllArgsConstructor
 public class LikeId implements Serializable {
     private String isbn;
-    private Integer memberId;
+    private Integer userId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof LikeId that)) return false;
-        return isbn.equals(that.isbn) && memberId.equals(that.memberId);
+        return isbn.equals(that.isbn) && userId.equals(that.userId);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(isbn, memberId);
+        return java.util.Objects.hash(isbn, userId);
     }
 }
