@@ -1,4 +1,4 @@
-package com.nhnacademy.books;
+package com.sajotuna.books;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
