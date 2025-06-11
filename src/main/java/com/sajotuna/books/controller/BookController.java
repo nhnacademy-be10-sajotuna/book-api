@@ -14,10 +14,8 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
-    // CategoryService는 CategoryController로 이동했습니다.
-    // private final CategoryService categoryService;
 
-    public BookController(BookService bookService) { // 생성자에서 CategoryService 제거
+    public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
@@ -31,12 +29,9 @@ public class BookController {
     // 특정 책 상세 정보 조회
     @GetMapping("/{isbn}")
     public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
+        // 서비스에서 예외를 던지므로, 여기서 null 체크 대신 직접 반환
         BookResponse book = bookService.getBookByIsbn(isbn);
-        if (book != null) {
-            return ResponseEntity.ok(book);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(book);
     }
 
     // 책 등록
@@ -45,5 +40,4 @@ public class BookController {
         BookResponse createdBook = bookService.createBook(bookRequest);
         return new ResponseEntity<>(createdBook, HttpStatus.CREATED);
     }
-
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/likes") // 좋아요 관련 API 엔드포인트는 /api/likes로 시작
+@RequestMapping("/api/likes")
 public class LikeController {
 
     private final LikeService likeService;
@@ -27,16 +27,8 @@ public class LikeController {
      */
     @PostMapping
     public ResponseEntity<LikeResponse> addLike(@RequestBody LikeRequest likeRequest) {
-        try {
-            LikeResponse response = likeService.addLike(likeRequest);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            // 사용자 또는 책을 찾을 수 없는 경우
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (IllegalStateException e) {
-            // 이미 좋아요를 누른 경우
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        }
+        LikeResponse response = likeService.addLike(likeRequest);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**
@@ -45,13 +37,8 @@ public class LikeController {
      */
     @DeleteMapping
     public ResponseEntity<Void> removeLike(@RequestParam Long userId, @RequestParam String bookIsbn) {
-        try {
-            likeService.removeLike(userId, bookIsbn);
-            return ResponseEntity.noContent().build(); // 204 No Content
-        } catch (IllegalArgumentException e) {
-            // 좋아요를 찾을 수 없거나 사용자/책이 유효하지 않은 경우
-            return ResponseEntity.notFound().build(); // 404 Not Found
-        }
+        likeService.removeLike(userId, bookIsbn);
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
     /**

@@ -7,6 +7,8 @@ import com.sajotuna.books.model.Category;
 import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.CategoryRepository;
 import com.sajotuna.books.service.BookService;
+import com.sajotuna.books.exception.BookNotFoundException; // 추가
+import com.sajotuna.books.exception.CategoryNotFoundException; // 추가
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +40,7 @@ public class BookServiceImpl implements BookService {
     public BookResponse getBookByIsbn(String isbn) {
         return bookRepository.findById(isbn)
                 .map(BookResponse::new)
-                .orElse(null);
+                .orElseThrow(() -> new BookNotFoundException(isbn)); // 예외 변경
     }
 
     @Override
@@ -62,25 +64,23 @@ public class BookServiceImpl implements BookService {
         // 카테고리 설정
         if (bookRequest.getCategoryIds() != null && !bookRequest.getCategoryIds().isEmpty()) {
             Set<Category> categories = bookRequest.getCategoryIds().stream()
-                    .map(categoryRepository::findById)
-                    .filter(java.util.Optional::isPresent)
-                    .map(java.util.Optional::get)
+                    .map(categoryId -> categoryRepository.findById(categoryId)
+                            .orElseThrow(() -> new CategoryNotFoundException(categoryId))) // 예외 변경
                     .collect(Collectors.toSet());
             book.setCategories(categories);
+        } else {
+            book.setCategories(new HashSet<>());
         }
 
-        // 태그 설정: bookRequest.getTags() 대신 bookRequest.getTagIds()를 사용하고,
-        // 필요에 따라 Long 타입을 String으로 변환합니다.
+        // 태그 설정
         if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
-            // tagIds를 String으로 변환하여 Book의 tags 필드에 설정
             Set<String> tags = bookRequest.getTagIds().stream()
-                    .map(String::valueOf) // Long을 String으로 변환
+                    .map(String::valueOf)
                     .collect(Collectors.toSet());
             book.setTags(tags);
         } else {
-            book.setTags(new HashSet<>()); // tagIds가 null이거나 비어있으면 빈 Set으로 초기화
+            book.setTags(new HashSet<>());
         }
-
 
         Book savedBook = bookRepository.save(book);
         return new BookResponse(savedBook);

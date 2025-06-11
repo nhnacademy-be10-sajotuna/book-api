@@ -1,4 +1,3 @@
-// src/main/java/com/sajotuna/books/service/impl/LikeServiceImpl.java
 package com.sajotuna.books.service.impl;
 
 import com.sajotuna.books.dto.BookResponse;
@@ -11,6 +10,10 @@ import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.LikeRepository;
 import com.sajotuna.books.repository.UserRepository;
 import com.sajotuna.books.service.LikeService;
+import com.sajotuna.books.exception.BookNotFoundException; // 추가
+import com.sajotuna.books.exception.UserNotFoundException; // 추가
+import com.sajotuna.books.exception.DuplicateLikeException; // 추가
+import com.sajotuna.books.exception.LikeNotFoundException; // 추가
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +26,8 @@ import java.util.stream.Collectors;
 public class LikeServiceImpl implements LikeService {
 
     private final LikeRepository likeRepository;
-    private final UserRepository userRepository; // 사용자 리포지토리 주입
-    private final BookRepository bookRepository; // 책 리포지토리 주입
+    private final UserRepository userRepository;
+    private final BookRepository bookRepository;
 
     public LikeServiceImpl(LikeRepository likeRepository, UserRepository userRepository, BookRepository bookRepository) {
         this.likeRepository = likeRepository;
@@ -35,49 +38,47 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public LikeResponse addLike(LikeRequest likeRequest) {
         User user = userRepository.findById(likeRequest.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + likeRequest.getUserId()));
+                .orElseThrow(() -> new UserNotFoundException(likeRequest.getUserId())); // 예외 변경
         Book book = bookRepository.findById(likeRequest.getBookIsbn())
-                .orElseThrow(() -> new IllegalArgumentException("Book not found with ISBN: " + likeRequest.getBookIsbn()));
+                .orElseThrow(() -> new BookNotFoundException(likeRequest.getBookIsbn())); // 예외 변경
 
-        // 이미 좋아요를 눌렀는지 확인
         if (likeRepository.findByUserIdAndBookIsbn(user.getId(), book.getIsbn()).isPresent()) {
-            throw new IllegalStateException("User already liked this book.");
+            throw new DuplicateLikeException(user.getId(), book.getIsbn()); // 예외 변경
         }
 
         Like like = new Like(user, book);
         Like savedLike = likeRepository.save(like);
 
-        // 책의 likes 수 증가 (만약 Book 엔티티에 likes 필드를 유지한다면)
-        book.setLikes(book.getLikes() + 1);
-        bookRepository.save(book); // 좋아요 수 업데이트
+        // 책의 likes 수 증가
+        book.setLikes(book.getLikes() != null ? book.getLikes() + 1 : 1);
+        bookRepository.save(book);
 
         return new LikeResponse(savedLike);
     }
 
     @Override
     public void removeLike(Long userId, String bookIsbn) {
-        Optional<Like> existingLike = likeRepository.findByUserIdAndBookIsbn(userId, bookIsbn);
-        if (existingLike.isPresent()) {
-            likeRepository.delete(existingLike.get());
+        Like existingLike = likeRepository.findByUserIdAndBookIsbn(userId, bookIsbn)
+                .orElseThrow(() -> new LikeNotFoundException(userId, bookIsbn)); // 예외 변경
 
-            // 책의 likes 수 감소 (만약 Book 엔티티에 likes 필드를 유지한다면)
-            Book book = bookRepository.findById(bookIsbn)
-                    .orElseThrow(() -> new IllegalArgumentException("Book not found with ISBN: " + bookIsbn));
-            book.setLikes(book.getLikes() - 1);
-            bookRepository.save(book); // 좋아요 수 업데이트
+        likeRepository.delete(existingLike);
 
-        } else {
-            throw new IllegalArgumentException("Like not found for user " + userId + " and book " + bookIsbn);
-        }
+        // 책의 likes 수 감소
+        Book book = bookRepository.findById(bookIsbn)
+                .orElseThrow(() -> new BookNotFoundException(bookIsbn)); // 이 부분은 좋아요 삭제 전에 책이 없으면 발생하지 않도록 할 수 있지만, 안전을 위해 유지
+        book.setLikes(book.getLikes() != null && book.getLikes() > 0 ? book.getLikes() - 1 : 0);
+        bookRepository.save(book);
     }
 
     @Override
     public List<BookResponse> getLikedBooksByUserId(Long userId) {
-        // 특정 사용자가 '좋아요'를 누른 Like 엔티티 목록을 가져와서
-        // 각 Like 엔티티에서 Book 엔티티를 추출한 후 BookResponse로 변환합니다.
-        return likeRepository.findByUserId(userId).stream()
-                .map(Like::getBook) // Like 객체에서 Book 객체만 추출
-                .map(BookResponse::new) // Book 객체를 BookResponse로 변환
+        // userId가 유효한지 확인하고 싶다면 아래 주석 해제
+        // userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+        List<Like> likes = likeRepository.findByUserId(userId);
+        return likes.stream()
+                .map(Like::getBook)
+                .map(BookResponse::new)
                 .toList();
     }
 
