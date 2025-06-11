@@ -19,7 +19,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
 
-      - name: Upload Jar
+      - name: Upload book Jar
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_IP }}
