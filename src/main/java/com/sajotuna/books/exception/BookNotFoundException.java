@@ -1,11 +1,11 @@
 package com.sajotuna.books.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.NOT_FOUND) // 404 Not Found
-public class BookNotFoundException extends RuntimeException {
+public class BookNotFoundException extends ApiException {
+    private static final String MESSAGE = "존재하지 않는 도서입니다: ";
+
     public BookNotFoundException(String isbn) {
-        super("Book not found with ISBN: " + isbn);
+        super(HttpStatus.NOT_FOUND.value(), MESSAGE + isbn);
     }
 }

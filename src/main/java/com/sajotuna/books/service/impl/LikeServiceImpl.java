@@ -3,6 +3,10 @@ package com.sajotuna.books.service.impl;
 import com.sajotuna.books.dto.BookResponse;
 import com.sajotuna.books.dto.LikeRequest;
 import com.sajotuna.books.dto.LikeResponse;
+import com.sajotuna.books.exception.BookNotFoundException; // 변경
+import com.sajotuna.books.exception.DuplicateLikeException; // 변경
+import com.sajotuna.books.exception.LikeNotFoundException; // 변경
+import com.sajotuna.books.exception.UserNotFoundException; // 변경
 import com.sajotuna.books.model.Book;
 import com.sajotuna.books.model.Like;
 import com.sajotuna.books.model.User;
@@ -10,10 +14,6 @@ import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.LikeRepository;
 import com.sajotuna.books.repository.UserRepository;
 import com.sajotuna.books.service.LikeService;
-import com.sajotuna.books.exception.BookNotFoundException; // 추가
-import com.sajotuna.books.exception.UserNotFoundException; // 추가
-import com.sajotuna.books.exception.DuplicateLikeException; // 추가
-import com.sajotuna.books.exception.LikeNotFoundException; // 추가
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +49,6 @@ public class LikeServiceImpl implements LikeService {
         Like like = new Like(user, book);
         Like savedLike = likeRepository.save(like);
 
-        // 책의 likes 수 증가
         book.setLikes(book.getLikes() != null ? book.getLikes() + 1 : 1);
         bookRepository.save(book);
 
@@ -63,9 +62,8 @@ public class LikeServiceImpl implements LikeService {
 
         likeRepository.delete(existingLike);
 
-        // 책의 likes 수 감소
         Book book = bookRepository.findById(bookIsbn)
-                .orElseThrow(() -> new BookNotFoundException(bookIsbn)); // 이 부분은 좋아요 삭제 전에 책이 없으면 발생하지 않도록 할 수 있지만, 안전을 위해 유지
+                .orElseThrow(() -> new BookNotFoundException(bookIsbn)); // 예외 발생 시키지 않도록 하려면 필요
         book.setLikes(book.getLikes() != null && book.getLikes() > 0 ? book.getLikes() - 1 : 0);
         bookRepository.save(book);
     }

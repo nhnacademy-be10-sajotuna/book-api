@@ -2,13 +2,13 @@ package com.sajotuna.books.service.impl;
 
 import com.sajotuna.books.dto.BookRequest;
 import com.sajotuna.books.dto.BookResponse;
+import com.sajotuna.books.exception.BookNotFoundException; // 변경
+import com.sajotuna.books.exception.CategoryNotFoundException; // 변경
 import com.sajotuna.books.model.Book;
 import com.sajotuna.books.model.Category;
 import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.CategoryRepository;
 import com.sajotuna.books.service.BookService;
-import com.sajotuna.books.exception.BookNotFoundException; // 추가
-import com.sajotuna.books.exception.CategoryNotFoundException; // 추가
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +61,6 @@ public class BookServiceImpl implements BookService {
                 bookRequest.getLikes()
         );
 
-        // 카테고리 설정
         if (bookRequest.getCategoryIds() != null && !bookRequest.getCategoryIds().isEmpty()) {
             Set<Category> categories = bookRequest.getCategoryIds().stream()
                     .map(categoryId -> categoryRepository.findById(categoryId)
@@ -72,7 +71,6 @@ public class BookServiceImpl implements BookService {
             book.setCategories(new HashSet<>());
         }
 
-        // 태그 설정
         if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
             Set<String> tags = bookRequest.getTagIds().stream()
                     .map(String::valueOf)

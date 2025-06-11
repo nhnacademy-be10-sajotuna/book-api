@@ -2,10 +2,10 @@ package com.sajotuna.books.service.impl;
 
 import com.sajotuna.books.dto.CategoryRequest;
 import com.sajotuna.books.dto.CategoryResponse;
+import com.sajotuna.books.exception.CategoryNotFoundException; // 변경
 import com.sajotuna.books.model.Category;
 import com.sajotuna.books.repository.CategoryRepository;
 import com.sajotuna.books.service.CategoryService;
-import com.sajotuna.books.exception.CategoryNotFoundException; // 추가
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
