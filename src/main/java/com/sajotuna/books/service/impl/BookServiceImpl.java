@@ -4,11 +4,13 @@ import com.sajotuna.books.dto.BookRequest;
 import com.sajotuna.books.dto.BookResponse;
 import com.sajotuna.books.exception.BookNotFoundException; // 변경
 import com.sajotuna.books.exception.CategoryNotFoundException; // 변경
+import com.sajotuna.books.exception.TagNotFoundException;
 import com.sajotuna.books.model.Book;
 import com.sajotuna.books.model.BookTag;
 import com.sajotuna.books.model.Category;
 import com.sajotuna.books.model.Tag;
 import com.sajotuna.books.repository.BookRepository;
+import com.sajotuna.books.repository.BookTagRepository;
 import com.sajotuna.books.repository.CategoryRepository;
 import com.sajotuna.books.service.BookService;
 import com.sajotuna.books.service.TagService;
@@ -29,6 +31,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
     private final TagService tagService;
+    private final BookTagRepository bookTagRepository;
 
 
     @Override
@@ -73,12 +76,10 @@ public class BookServiceImpl implements BookService {
             book.setCategories(new HashSet<>());
         }
         if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
-            Set<String> tags = bookRequest.getTagIds().stream()
-                    .map(String::valueOf)
+            Set<BookTag> tags = bookRequest.getTagIds().stream()
+                    .map(id -> bookTagRepository.findById(id).orElseThrow(() -> new TagNotFoundException(id)))
                     .collect(Collectors.toSet());
-            book.setTags(tags);
-        } else {
-            book.setTags(new HashSet<>());
+            book.setBookTags(tags);
         }
 
         Book savedBook = bookRepository.save(book);
