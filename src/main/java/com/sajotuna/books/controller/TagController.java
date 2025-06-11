@@ -5,7 +5,7 @@ import com.sajotuna.books.dto.TagResponse;
 import com.sajotuna.books.exception.TagAlreadyExistsException;
 import com.sajotuna.books.exception.TagNotFoundException;
 import com.sajotuna.books.model.Tag;
-import com.sajotuna.books.repository.TagRepository;
+
 import com.sajotuna.books.service.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/books/tags")
+@RequestMapping("/tags")
 @RequiredArgsConstructor
 public class TagController {
 
