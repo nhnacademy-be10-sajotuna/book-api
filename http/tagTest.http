@@ -1,0 +1,28 @@
+### 태그 생성
+POST localhost:10364/tags
+Content-Type: application/json
+
+{
+  "tagName": "tagNamee"
+}
+
+### 태그 불러오기
+GET localhost:10364/tags/2
+Content-Type: application/json
+
+### 태그 전체 불러오기
+GET localhost:10364/tags
+Content-Type: application/json
+
+### 수정하기
+PUT localhost:10364/tags/2
+Content-Type: application/json
+
+{
+
+  "tagName" : "tagName2"
+}
+
+### 태그 삭제하기
+DELETE localhost:10364/tags/2
+Content-Type: application/json

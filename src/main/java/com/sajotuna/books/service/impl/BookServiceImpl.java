@@ -5,11 +5,15 @@ import com.sajotuna.books.dto.BookResponse;
 import com.sajotuna.books.exception.BookNotFoundException; // 변경
 import com.sajotuna.books.exception.CategoryNotFoundException; // 변경
 import com.sajotuna.books.model.Book;
+import com.sajotuna.books.model.BookTag;
 import com.sajotuna.books.model.Category;
+import com.sajotuna.books.model.Tag;
 import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.CategoryRepository;
 import com.sajotuna.books.service.BookService;
+import com.sajotuna.books.service.TagService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -19,15 +23,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final TagService tagService;
 
-    public BookServiceImpl(BookRepository bookRepository, CategoryRepository categoryRepository) {
-        this.bookRepository = bookRepository;
-        this.categoryRepository = categoryRepository;
-    }
 
     @Override
     public List<BookResponse> getAllBooks() {
@@ -70,7 +72,6 @@ public class BookServiceImpl implements BookService {
         } else {
             book.setCategories(new HashSet<>());
         }
-
         if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
             Set<String> tags = bookRequest.getTagIds().stream()
                     .map(String::valueOf)

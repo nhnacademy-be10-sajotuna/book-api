@@ -62,11 +62,9 @@ public class Book {
     )
     private Set<Category> categories = new HashSet<>();
 
-    // Book 엔티티와 Tag (단순 문자열) 간의 관계
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "book_tags", joinColumns = @JoinColumn(name = "book_isbn"))
-    @Column(name = "tag")
-    private Set<String> tags = new HashSet<>();
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookTag> bookTags = new HashSet<>();
+
 
     // 생성자 (필요에 따라 추가)
     public Book(String isbn, String title, String author, String publisher, LocalDate publicationDate,
