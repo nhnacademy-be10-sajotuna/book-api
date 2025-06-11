@@ -8,7 +8,7 @@
         <version>3.4.6</version>
         <relativePath/> </parent>
     <groupId>com.sajotuna</groupId>
-    <artifactId>books</artifactId>
+    <artifactId>book</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>books</name>
     <description>books</description>
