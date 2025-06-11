@@ -1,11 +1,8 @@
 package com.sajotuna.books.controller;
 
 import com.sajotuna.books.dto.BookResponse;
-import com.sajotuna.books.dto.CategoryRequest;
-import com.sajotuna.books.dto.CategoryResponse;
 import com.sajotuna.books.dto.BookRequest;
 import com.sajotuna.books.service.BookService;
-import com.sajotuna.books.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +14,9 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
-    private final CategoryService categoryService;
 
-    public BookController(BookService bookService, CategoryService categoryService) {
+    public BookController(BookService bookService) {
         this.bookService = bookService;
-        this.categoryService = categoryService;
     }
 
     // 모든 책 목록 조회
@@ -31,35 +26,18 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    // 특정 책 상세 정보 조회 (새로 추가)
+    // 특정 책 상세 정보 조회
     @GetMapping("/{isbn}")
     public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
+        // 서비스에서 예외를 던지므로, 여기서 null 체크 대신 직접 반환
         BookResponse book = bookService.getBookByIsbn(isbn);
-        if (book != null) {
-            return ResponseEntity.ok(book);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(book);
     }
 
-    // 책 등록 (기존 코드)
+    // 책 등록
     @PostMapping
     public ResponseEntity<BookResponse> createBook(@RequestBody BookRequest bookRequest) {
         BookResponse createdBook = bookService.createBook(bookRequest);
         return new ResponseEntity<>(createdBook, HttpStatus.CREATED);
-    }
-
-    // 카테고리 등록 (기존 코드)
-    @PostMapping("/categories")
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest categoryRequest) {
-        CategoryResponse createdCategory = categoryService.createCategory(categoryRequest);
-        return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
-    }
-
-    // 모든 카테고리 조회 (기존 코드)
-    @GetMapping("/categories")
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
     }
 }

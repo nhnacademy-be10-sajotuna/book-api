@@ -2,6 +2,8 @@ package com.sajotuna.books.service.impl;
 
 import com.sajotuna.books.dto.BookRequest;
 import com.sajotuna.books.dto.BookResponse;
+import com.sajotuna.books.exception.BookNotFoundException; // 변경
+import com.sajotuna.books.exception.CategoryNotFoundException; // 변경
 import com.sajotuna.books.model.Book;
 import com.sajotuna.books.model.BookTag;
 import com.sajotuna.books.model.Category;
@@ -14,6 +16,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,10 +39,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse getBookByIsbn(String isbn) { // 구현 추가
+    public BookResponse getBookByIsbn(String isbn) {
         return bookRepository.findById(isbn)
                 .map(BookResponse::new)
-                .orElse(null); // 책이 없으면 null 반환 (컨트롤러에서 404 처리)
+                .orElseThrow(() -> new BookNotFoundException(isbn)); // 예외 변경
     }
 
     @Override
@@ -50,8 +53,8 @@ public class BookServiceImpl implements BookService {
                 bookRequest.getAuthor(),
                 bookRequest.getPublisher(),
                 bookRequest.getPublicationDate(),
-                bookRequest.getPageCount(), // 추가
-                bookRequest.getImageUrl(), // 추가
+                bookRequest.getPageCount(),
+                bookRequest.getImageUrl(),
                 bookRequest.getDescription(),
                 bookRequest.getTableOfContents(),
                 bookRequest.getOriginalPrice(),
@@ -60,23 +63,22 @@ public class BookServiceImpl implements BookService {
                 bookRequest.getLikes()
         );
 
-        // 카테고리 설정
         if (bookRequest.getCategoryIds() != null && !bookRequest.getCategoryIds().isEmpty()) {
             Set<Category> categories = bookRequest.getCategoryIds().stream()
-                    .map(categoryRepository::findById)
-                    .filter(java.util.Optional::isPresent)
-                    .map(java.util.Optional::get)
+                    .map(categoryId -> categoryRepository.findById(categoryId)
+                            .orElseThrow(() -> new CategoryNotFoundException(categoryId))) // 예외 변경
                     .collect(Collectors.toSet());
             book.setCategories(categories);
+        } else {
+            book.setCategories(new HashSet<>());
         }
-
-        // 태그 설정
-        if (bookRequest.getTags() != null && !bookRequest.getTags().isEmpty()) {
-            Set<Tag> tags = tagService.findOrCreateTags(bookRequest.getTags());
-            for (Tag tag : tags) {
-                BookTag bookTag = new BookTag(tag, book);
-                book.getBookTags().add(bookTag);
-            }
+        if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
+            Set<String> tags = bookRequest.getTagIds().stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toSet());
+            book.setTags(tags);
+        } else {
+            book.setTags(new HashSet<>());
         }
 
         Book savedBook = bookRepository.save(book);

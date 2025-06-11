@@ -1,3 +1,4 @@
+// src/main/java/com/sajotuna/books/dto/BookRequest.java
 package com.sajotuna.books.dto;
 
 import lombok.Getter;
@@ -17,14 +18,14 @@ public class BookRequest {
     private String author;
     private String publisher;
     private LocalDate publicationDate;
-    private Integer pageCount; // 추가: 페이지 수
-    private String imageUrl; // 추가: 이미지 URL
+    private Integer pageCount;
+    private String imageUrl;
     private String description;
     private String tableOfContents;
     private Double originalPrice;
     private Double sellingPrice;
     private Boolean giftWrappingAvailable;
     private Integer likes;
-    private Set<Long> categoryIds; // 책에 연결할 카테고리 ID 목록
-    private Set<String> tags; // 책에 연결할 태그 목록
+    private Set<Long> categoryIds;
+    private Set<Long> tagIds; // Set<String>에서 Set<Long>으로 변경: 태그 ID 목록
 }
