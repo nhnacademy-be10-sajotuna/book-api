@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.0</version>
+        <version>3.4.6</version>
         <relativePath/> </parent>
     <groupId>com.sajotuna</groupId>
     <artifactId>books</artifactId>
@@ -14,7 +14,7 @@
     <description>books</description>
     <properties>
         <java.version>21</java.version>
-        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <spring-cloud.version>2024.0.0</spring-cloud.version>
     </properties>
 
     <dependencyManagement>
@@ -71,6 +71,11 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+         </dependency>
 
     </dependencies>
 
