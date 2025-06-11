@@ -3,11 +3,15 @@ package com.sajotuna.books.service.impl;
 import com.sajotuna.books.dto.BookRequest;
 import com.sajotuna.books.dto.BookResponse;
 import com.sajotuna.books.model.Book;
+import com.sajotuna.books.model.BookTag;
 import com.sajotuna.books.model.Category;
+import com.sajotuna.books.model.Tag;
 import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.CategoryRepository;
 import com.sajotuna.books.service.BookService;
+import com.sajotuna.books.service.TagService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,15 +20,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final TagService tagService;
 
-    public BookServiceImpl(BookRepository bookRepository, CategoryRepository categoryRepository) {
-        this.bookRepository = bookRepository;
-        this.categoryRepository = categoryRepository;
-    }
 
     @Override
     public List<BookResponse> getAllBooks() {
@@ -69,8 +71,12 @@ public class BookServiceImpl implements BookService {
         }
 
         // 태그 설정
-        if (bookRequest.getTags() != null) {
-            book.setTags(bookRequest.getTags());
+        if (bookRequest.getTags() != null && !bookRequest.getTags().isEmpty()) {
+            Set<Tag> tags = tagService.findOrCreateTags(bookRequest.getTags());
+            for (Tag tag : tags) {
+                BookTag bookTag = new BookTag(tag, book);
+                book.getBookTags().add(bookTag);
+            }
         }
 
         Book savedBook = bookRepository.save(book);

@@ -1,12 +1,15 @@
 package com.sajotuna.books.dto;
 
 import com.sajotuna.books.model.Book;
+import com.sajotuna.books.model.BookTag;
+import com.sajotuna.books.model.Tag;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -28,7 +31,7 @@ public class BookResponse {
     private Boolean giftWrappingAvailable;
     private Integer likes;
     private List<CategoryResponse> categories; // 책에 연결된 카테고리
-    private List<String> tags; // 책에 연결된 태그
+    private Set<String> tags; // 책에 연결된 태그
 
     public BookResponse(Book book) {
         this.isbn = book.getIsbn();
@@ -48,6 +51,10 @@ public class BookResponse {
         this.categories = book.getCategories().stream()
                 .map(CategoryResponse::new)
                 .collect(Collectors.toList());
-        this.tags = book.getTags().stream().collect(Collectors.toList());
+        this.tags = book.getBookTags().stream()
+                .map(BookTag::getTag)
+                .map(Tag::getTagName)
+                .collect(Collectors.toSet());
+
     }
 }
