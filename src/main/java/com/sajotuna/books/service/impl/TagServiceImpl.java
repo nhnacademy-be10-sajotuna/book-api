@@ -54,13 +54,15 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public Tag createTag(String tagName) {
+
         if (tagName == null || tagName.trim().isEmpty()) {
             throw new InvalidTagNameException();
         }
         if (tagRepository.existsByTagName(tagName)) {
             throw new TagAlreadyExistsException(tagName);
         }
-        return tagRepository.save(new Tag(tagName));
+        Tag entity = new Tag(tagName);
+        return tagRepository.save(entity);
     }
     /**
      * 기존 태그 이름 수정

@@ -44,9 +44,6 @@ public class TagController {
     //새 태그 생성
     @PostMapping
     public ResponseEntity<TagResponse> createTag(@RequestBody @Valid TagRequest request) {
-        if (tagService.getAllTags().stream().anyMatch(t -> t.getTagName().equals(request.tagName()))) {
-            throw new TagAlreadyExistsException(request.tagName());
-        }
 
         Tag saved = tagService.createTag(request.tagName());
         return ResponseEntity.ok(TagResponse.from(saved));
