@@ -1,18 +1,16 @@
-// src/main/java/com/sajotuna/books/service/impl/BookServiceImpl.java
 package com.sajotuna.books.service.impl;
 
 import com.sajotuna.books.dto.BookRequest;
 import com.sajotuna.books.dto.BookResponse;
 import com.sajotuna.books.model.Book;
 import com.sajotuna.books.model.Category;
-import com.sajotuna.books.model.Tag; // Tag 엔티티 임포트
 import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.CategoryRepository;
-import com.sajotuna.books.repository.TagRepository; // TagRepository 임포트
 import com.sajotuna.books.service.BookService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,12 +21,10 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
-    private final TagRepository tagRepository; // TagRepository 주입
 
-    public BookServiceImpl(BookRepository bookRepository, CategoryRepository categoryRepository, TagRepository tagRepository) {
+    public BookServiceImpl(BookRepository bookRepository, CategoryRepository categoryRepository) {
         this.bookRepository = bookRepository;
         this.categoryRepository = categoryRepository;
-        this.tagRepository = tagRepository; // 주입
     }
 
     @Override
@@ -63,7 +59,7 @@ public class BookServiceImpl implements BookService {
                 bookRequest.getLikes()
         );
 
-        // 카테고리 설정 (기존과 동일)
+        // 카테고리 설정
         if (bookRequest.getCategoryIds() != null && !bookRequest.getCategoryIds().isEmpty()) {
             Set<Category> categories = bookRequest.getCategoryIds().stream()
                     .map(categoryRepository::findById)
@@ -73,15 +69,18 @@ public class BookServiceImpl implements BookService {
             book.setCategories(categories);
         }
 
-        // 태그 설정 (Tag 엔티티 사용하도록 변경)
+        // 태그 설정: bookRequest.getTags() 대신 bookRequest.getTagIds()를 사용하고,
+        // 필요에 따라 Long 타입을 String으로 변환합니다.
         if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
-            Set<Tag> tags = bookRequest.getTagIds().stream()
-                    .map(tagRepository::findById) // ID로 Tag 엔티티 조회
-                    .filter(java.util.Optional::isPresent)
-                    .map(java.util.Optional::get)
+            // tagIds를 String으로 변환하여 Book의 tags 필드에 설정
+            Set<String> tags = bookRequest.getTagIds().stream()
+                    .map(String::valueOf) // Long을 String으로 변환
                     .collect(Collectors.toSet());
             book.setTags(tags);
+        } else {
+            book.setTags(new HashSet<>()); // tagIds가 null이거나 비어있으면 빈 Set으로 초기화
         }
+
 
         Book savedBook = bookRepository.save(book);
         return new BookResponse(savedBook);

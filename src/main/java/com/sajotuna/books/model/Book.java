@@ -1,4 +1,3 @@
-// src/main/java/com/sajotuna/books/model/Book.java
 package com.sajotuna.books.model;
 
 import jakarta.persistence.*;
@@ -13,11 +12,11 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "books")
+@Table(name = "books") // 테이블 이름 명시
 public class Book {
 
     @Id
-    private String isbn;
+    private String isbn; // 국제 표준 도서 번호
 
     private String title;
     private String author;
@@ -26,12 +25,15 @@ public class Book {
     @Column(name = "publication_date")
     private LocalDate publicationDate;
 
+    // 추가: 페이지 수
     @Column(name = "page_count")
     private Integer pageCount;
 
+    // 추가: 책 이미지 URL (대량의 바이너리 데이터 대신 URL로 대체)
     @Column(name = "image_url")
     private String imageUrl;
 
+    // @Lob 어노테이션은 CLOB/BLOB 타입에 매핑됩니다.
     @Lob
     @Column(name = "description")
     private String description;
@@ -49,8 +51,9 @@ public class Book {
     @Column(name = "gift_wrapping_available")
     private Boolean giftWrappingAvailable;
 
-    private Integer likes;
+    private Integer likes; // 좋아요 수
 
+    // Book 엔티티와 Category 엔티티 간의 다대다 관계
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "book_categories",
@@ -59,16 +62,13 @@ public class Book {
     )
     private Set<Category> categories = new HashSet<>();
 
-    // 기존의 @ElementCollection 대신 @ManyToMany 관계로 변경
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "book_tags_join", // 새로운 조인 테이블 이름 (기존 book_tags와 구분)
-            joinColumns = @JoinColumn(name = "book_isbn"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id") // Tag 엔티티의 ID와 연결
-    )
-    private Set<Tag> tags = new HashSet<>(); // Set<String>에서 Set<Tag>로 변경
+    // Book 엔티티와 Tag (단순 문자열) 간의 관계
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "book_tags", joinColumns = @JoinColumn(name = "book_isbn"))
+    @Column(name = "tag")
+    private Set<String> tags = new HashSet<>();
 
-    // 생성자 (Tag 타입 변경 반영)
+    // 생성자 (필요에 따라 추가)
     public Book(String isbn, String title, String author, String publisher, LocalDate publicationDate,
                 Integer pageCount, String imageUrl, String description, String tableOfContents,
                 Double originalPrice, Double sellingPrice, Boolean giftWrappingAvailable, Integer likes) {
@@ -87,7 +87,8 @@ public class Book {
         this.likes = likes;
     }
 
-    @Transient
+    // 할인율 계산 getter (DTO에 포함될 수 있음)
+    @Transient // 데이터베이스 컬럼으로 매핑하지 않음
     public Double getDiscountRate() {
         if (originalPrice != null && sellingPrice != null && originalPrice > 0) {
             return ((originalPrice - sellingPrice) / originalPrice) * 100.0;

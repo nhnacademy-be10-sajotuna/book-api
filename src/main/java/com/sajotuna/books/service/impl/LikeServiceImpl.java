@@ -78,7 +78,7 @@ public class LikeServiceImpl implements LikeService {
         return likeRepository.findByUserId(userId).stream()
                 .map(Like::getBook) // Like 객체에서 Book 객체만 추출
                 .map(BookResponse::new) // Book 객체를 BookResponse로 변환
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
