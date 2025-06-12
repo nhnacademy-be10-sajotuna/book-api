@@ -9,6 +9,8 @@ import com.sajotuna.books.model.Tag;
 import com.sajotuna.books.service.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,12 +27,11 @@ public class TagController {
 
    //모든 태그 조회
    @GetMapping
-   public ResponseEntity<List<TagResponse>> getAllTags() {
-       List<TagResponse> tags = tagService.getAllTags().stream()
-               .map(TagResponse::from)
-               .collect(Collectors.toList());
-       return ResponseEntity.ok(tags);
+   public ResponseEntity<Page<TagResponse>> getAllTags(Pageable pageable) {
+       return ResponseEntity.ok(tagService.getAllTags(pageable));
+
    }
+
 
    //특정 태그 조회
     @GetMapping("/{id}")

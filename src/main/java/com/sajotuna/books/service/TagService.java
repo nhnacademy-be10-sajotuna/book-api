@@ -1,6 +1,9 @@
 package com.sajotuna.books.service;
 
+import com.sajotuna.books.dto.TagResponse;
 import com.sajotuna.books.model.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,5 +19,7 @@ public interface TagService {
     Tag createTag(String tagName);
     Tag updateTag(Long id, String newTagName);
     boolean deleteTag(Long id);
+    Page<TagResponse> getAllTags(Pageable pageable);
+
 }
 

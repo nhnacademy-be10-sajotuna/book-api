@@ -1,5 +1,6 @@
 package com.sajotuna.books.service.impl;
 
+import com.sajotuna.books.dto.TagResponse;
 import com.sajotuna.books.exception.InvalidTagNameException;
 import com.sajotuna.books.exception.TagAlreadyExistsException;
 import com.sajotuna.books.exception.TagNotFoundException;
@@ -7,6 +8,8 @@ import com.sajotuna.books.model.Tag;
 import com.sajotuna.books.repository.TagRepository;
 import com.sajotuna.books.service.TagService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,8 +33,10 @@ public class TagServiceImpl implements TagService {
                     .orElseGet(() -> tagRepository.save(new Tag(name)));
             tags.add(tag);
         }
+
         return tags;
     }
+
 
     /**
      * 전체 태그 목록 조회
@@ -91,4 +96,11 @@ public class TagServiceImpl implements TagService {
         tagRepository.deleteById(id);
         return true;
     }
+
+    @Override
+    public Page<TagResponse> getAllTags(Pageable pageable) {
+        Page<Tag> tagPage = tagRepository.findAll(pageable);
+        return tagPage.map(TagResponse::from);
+    }
+
 }
