@@ -2,15 +2,27 @@ package com.sajotuna.books.repository;
 
 import com.sajotuna.books.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, String> { // Book 엔티티와 String 타입의 ID (ISBN)
-    // Spring Data JPA의 메소드 쿼리 기능을 활용
+public interface BookRepository extends JpaRepository<Book, String> {
     List<Book> findByTitleContainingIgnoreCase(String titleKeyword);
     List<Book> findByAuthorContainingIgnoreCase(String authorKeyword);
 
-    // ISBN으로 조회는 JpaRepository 기본 메서드인 findById(String id) 사용 가능
-    // Optional<Book> findByIsbn(String isbn); // 직접 정의할 필요 없음
+    @Query("SELECT b FROM Book b LEFT JOIN FETCH b.categories LEFT JOIN FETCH b.bookTags bt LEFT JOIN FETCH bt.tag WHERE b.isbn = :isbn")
+    Optional<Book> findByIdWithCategoriesAndTags(@Param("isbn") String isbn);
+
+    @Query("SELECT b FROM Book b LEFT JOIN FETCH b.categories LEFT JOIN FETCH b.bookTags bt LEFT JOIN FETCH bt.tag")
+    List<Book> findAllWithCategoriesAndTags();
+
+    // ⭐ 이 findByKeyword 메서드를 삭제합니다. ⭐
+    // @Query("SELECT b FROM Book b WHERE " +
+    //         "LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+    //         "LOWER(b.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+    //         "LOWER(b.author) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    // List<Book> findByKeyword(@Param("keyword") String keyword);
 }

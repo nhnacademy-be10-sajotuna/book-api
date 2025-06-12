@@ -26,11 +26,12 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    // 특정 책 상세 정보 조회
+    // 특정 책 상세 정보 조회 및 조회수 증가
     @GetMapping("/{isbn}")
     public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
-        // 서비스에서 예외를 던지므로, 여기서 null 체크 대신 직접 반환
         BookResponse book = bookService.getBookByIsbn(isbn);
+        // 조회수 증가 로직 (SearchService로 옮길 수도 있으나, 여기서는 상세 조회 시 증가)
+        bookService.incrementViewCount(isbn);
         return ResponseEntity.ok(book);
     }
 

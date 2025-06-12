@@ -36,16 +36,16 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookResponse> getAllBooks() {
-        return bookRepository.findAll().stream()
+        return bookRepository.findAllWithCategoriesAndTags().stream() // N+1 문제 방지를 위해 변경
                 .map(BookResponse::new)
                 .collect(Collectors.toList());
     }
 
     @Override
     public BookResponse getBookByIsbn(String isbn) {
-        return bookRepository.findById(isbn)
+        return bookRepository.findByIdWithCategoriesAndTags(isbn) // N+1 문제 방지를 위해 변경
                 .map(BookResponse::new)
-                .orElseThrow(() -> new BookNotFoundException(isbn)); // 예외 변경
+                .orElseThrow(() -> new BookNotFoundException(isbn));
     }
 
     @Override
@@ -69,20 +69,34 @@ public class BookServiceImpl implements BookService {
         if (bookRequest.getCategoryIds() != null && !bookRequest.getCategoryIds().isEmpty()) {
             Set<Category> categories = bookRequest.getCategoryIds().stream()
                     .map(categoryId -> categoryRepository.findById(categoryId)
-                            .orElseThrow(() -> new CategoryNotFoundException(categoryId))) // 예외 변경
+                            .orElseThrow(() -> new CategoryNotFoundException(categoryId)))
                     .collect(Collectors.toSet());
             book.setCategories(categories);
         } else {
             book.setCategories(new HashSet<>());
         }
+
+        Book savedBook = bookRepository.save(book); // Save the book first to get it managed
+
         if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
-            Set<BookTag> tags = bookRequest.getTagIds().stream()
-                    .map(id -> bookTagRepository.findById(id).orElseThrow(() -> new TagNotFoundException(id)))
-                    .collect(Collectors.toSet());
-            book.setBookTags(tags);
+            Set<BookTag> bookTags = new HashSet<>();
+            for (Long tagId : bookRequest.getTagIds()) {
+                Tag tag = tagService.getTagById(tagId) // Use tagService to get the Tag entity
+                        .orElseThrow(() -> new TagNotFoundException(tagId));
+                bookTags.add(new BookTag(tag, savedBook)); // Create BookTag with the savedBook
+            }
+            savedBook.getBookTags().addAll(bookTags);
+            bookTagRepository.saveAll(bookTags); // Explicitly save BookTag entities
         }
 
-        Book savedBook = bookRepository.save(book);
         return new BookResponse(savedBook);
+    }
+
+    @Override
+    public void incrementViewCount(String isbn) {
+        Book book = bookRepository.findById(isbn)
+                .orElseThrow(() -> new BookNotFoundException(isbn));
+        book.setViewCount(book.getViewCount() + 1);
+        bookRepository.save(book);
     }
 }

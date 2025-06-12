@@ -30,6 +30,9 @@ public class BookResponse {
     private Double discountRate; // 할인율은 계산된 값
     private Boolean giftWrappingAvailable;
     private Integer likes;
+    private Integer viewCount; // 추가: 조회수
+    private Double averageRating; // 추가: 평균 평점
+    private Long reviewCount; // 추가: 리뷰 수
     private List<CategoryResponse> categories; // 책에 연결된 카테고리
     private Set<String> tags; // 책에 연결된 태그
 
@@ -39,15 +42,18 @@ public class BookResponse {
         this.author = book.getAuthor();
         this.publisher = book.getPublisher();
         this.publicationDate = book.getPublicationDate();
-        this.pageCount = book.getPageCount(); // 추가
-        this.imageUrl = book.getImageUrl(); // 추가
+        this.pageCount = book.getPageCount();
+        this.imageUrl = book.getImageUrl();
         this.description = book.getDescription();
         this.tableOfContents = book.getTableOfContents();
         this.originalPrice = book.getOriginalPrice();
         this.sellingPrice = book.getSellingPrice();
-        this.discountRate = book.getDiscountRate(); // 계산된 값 사용
+        this.discountRate = book.getDiscountRate();
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
+        this.viewCount = book.getViewCount(); // 추가
+        this.averageRating = book.getAverageRating(); // 추가
+        this.reviewCount = book.getReviewCount(); // 추가
         this.categories = book.getCategories().stream()
                 .map(CategoryResponse::new)
                 .collect(Collectors.toList());
@@ -55,6 +61,5 @@ public class BookResponse {
                 .map(BookTag::getTag)
                 .map(Tag::getTagName)
                 .collect(Collectors.toSet());
-
     }
 }

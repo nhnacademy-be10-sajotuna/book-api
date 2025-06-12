@@ -53,6 +53,15 @@ public class Book {
 
     private Integer likes; // 좋아요 수
 
+    @Column(name = "view_count", columnDefinition = "INT DEFAULT 0") // 추가: 조회수
+    private Integer viewCount = 0;
+
+    @Column(name = "average_rating", columnDefinition = "DOUBLE DEFAULT 0.0") // 추가: 평균 평점
+    private Double averageRating = 0.0;
+
+    @Column(name = "review_count", columnDefinition = "BIGINT DEFAULT 0") // 추가: 리뷰 수
+    private Long reviewCount = 0L;
+
     // Book 엔티티와 Category 엔티티 간의 다대다 관계
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -65,6 +74,8 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> bookTags = new HashSet<>();
 
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review> reviews = new HashSet<>();
 
 
     // 생성자 (필요에 따라 추가)
@@ -84,6 +95,9 @@ public class Book {
         this.sellingPrice = sellingPrice;
         this.giftWrappingAvailable = giftWrappingAvailable;
         this.likes = likes;
+        this.viewCount = 0; // 기본값 설정
+        this.averageRating = 0.0; // 기본값 설정
+        this.reviewCount = 0L; // 기본값 설정
     }
 
     // 할인율 계산 getter (DTO에 포함될 수 있음)
