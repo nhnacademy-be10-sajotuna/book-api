@@ -3,16 +3,21 @@ POST localhost:10364/api/tags
 Content-Type: application/json
 
 {
-  "tagName": "입문"
+  "tagName": "입문1"
 }
 
 ### 태그 불러오기
 GET localhost:10364/api/tags/2
 Content-Type: application/json
 
-### 태그 전체 불러오기
-GET localhost:10364/api/tags
-Content-Type: application/json
+//### 태그 전체 불러오기
+//GET localhost:10364/api/tags
+//Content-Type: application/json
+
+### 전체 태그 목록 (10개씩 보기)
+GET http://localhost:10364/api/tags?page=0&size=10
+Accept: application/json
+
 
 ### 수정하기
 PUT localhost:10364/api/tags/2
@@ -26,3 +31,4 @@ Content-Type: application/json
 ### 태그 삭제하기
 DELETE localhost:10364/api/tags/2
 Content-Type: application/json
+
