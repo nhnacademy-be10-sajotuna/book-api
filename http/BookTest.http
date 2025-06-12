@@ -1,0 +1,21 @@
+### 책 등록
+POST localhost:10364/api/books
+Content-Type: application/json
+
+{
+  "isbn": "9781234567890",
+  "title": "스프링 부트 실전",
+  "author": "홍길동",
+  "publisher": "백엔드출판사",
+  "publicationDate": "2024-05-10",
+  "pageCount": 350,
+  "imageUrl": "https://example.com/book.jpg",
+  "description": "<p>이 책은 <strong>스프링 부트</strong>를 활용한 웹 개발 입문서입니다.</p>",
+  "tableOfContents": "<ul><li>1장: 개요</li><li>2장: 환경 설정</li><li>3장: REST API</li></ul>",
+  "originalPrice": 30000,
+  "sellingPrice": 27000,
+  "giftWrappingAvailable": true,
+  "likes": 0,
+  "categoryIds": [1, 2],
+  "tags": ["스프링", "백엔드", "입문"]
+}

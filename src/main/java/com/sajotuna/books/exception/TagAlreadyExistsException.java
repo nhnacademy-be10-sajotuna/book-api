@@ -8,4 +8,8 @@ public class TagAlreadyExistsException extends ApiException{
     public TagAlreadyExistsException(String tagName) {
         super(HttpStatus.CONFLICT.value(), MESSAGE + tagName);
     }
+
+    public TagAlreadyExistsException(Long id, String tagName) {
+        super(HttpStatus.CONFLICT.value(), MESSAGE + "[ID: " + id + ", 이름: " + tagName + "]");
+    }
 }

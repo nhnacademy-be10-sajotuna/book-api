@@ -66,6 +66,7 @@ public class Book {
     private Set<BookTag> bookTags = new HashSet<>();
 
 
+
     // 생성자 (필요에 따라 추가)
     public Book(String isbn, String title, String author, String publisher, LocalDate publicationDate,
                 Integer pageCount, String imageUrl, String description, String tableOfContents,
