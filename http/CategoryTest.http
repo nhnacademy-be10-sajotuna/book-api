@@ -1,0 +1,19 @@
+### 카테고리 1 등록
+POST http://localhost:10364/api/categories
+Content-Type: application/json
+
+{
+  "name": "웹 개발"
+}
+
+### 카테고리 2 등록
+POST http://localhost:10364/api/categories
+Content-Type: application/json
+
+{
+  "name": "프레임워크"
+}
+
+### 전체 카테고리 조회
+GET http://localhost:10364/api/categories
+Accept: application/json
