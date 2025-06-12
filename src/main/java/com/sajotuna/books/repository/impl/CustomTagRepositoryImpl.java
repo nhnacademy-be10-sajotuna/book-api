@@ -2,7 +2,6 @@ package com.sajotuna.books.repository.impl;
 
 import com.querydsl.core.QueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sajotuna.books.model.QTag;
 import com.sajotuna.books.model.Tag;
 import com.sajotuna.books.repository.CustomTagRepository;
 import lombok.RequiredArgsConstructor;
