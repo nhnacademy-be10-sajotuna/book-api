@@ -1,0 +1,3 @@
+### 키워드로 수집
+POST http://localhost:10364/api/admin/search/import-by-keyword?keyword=요리&page=2
+
