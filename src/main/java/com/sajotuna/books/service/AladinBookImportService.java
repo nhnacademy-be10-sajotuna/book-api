@@ -56,32 +56,32 @@ public class AladinBookImportService {
         }
     }
 
-    public void importBooksByCategoryId(Integer categoryId, int totalPages) {
-         for (int page = 1; page <= totalPages; page++) {
-            String url = UriComponentsBuilder.fromUriString(BASE_URL)
-                    .queryParam("ttbkey", TTB_KEY)
-                    .queryParam("CategoryId", categoryId)
-                    .queryParam("MaxResults", 50)
-                    .queryParam("start", page)
-                    .queryParam("SearchTarget", "Book")
-                    .queryParam("output", "JS")
-                    .queryParam("Version", "20131101")
-                    .toUriString();
-
-            try {
-                ItemSearchResponse response = restTemplate.getForObject(url, ItemSearchResponse.class);
-                if (response != null && response.getItem() != null) {
-                    List<Book> books = AladinConverter.toBookEntityList(response.getItem());
-                    List<Book> filtered = books.stream()
-                            .filter(book -> !bookRepository.existsById(book.getIsbn()))
-                            .toList();
-                    bookListService.saveAllBooks(filtered);
-                    log.info("✅ [카테고리 {}] page {}: {}권 저장 완료", categoryId, page, filtered.size());
-                }
-            } catch (Exception e) {
-                log.error("❌ [카테고리 {}] page {} 실패: {}", categoryId, page, e.getMessage());
-            }
-        }
-    }
+//    public void importBooksByCategoryId(Integer categoryId, int totalPages) {
+//         for (int page = 1; page <= totalPages; page++) {
+//            String url = UriComponentsBuilder.fromUriString(BASE_URL)
+//                    .queryParam("ttbkey", TTB_KEY)
+//                    .queryParam("CategoryId", categoryId)
+//                    .queryParam("MaxResults", 50)
+//                    .queryParam("start", page)
+//                    .queryParam("SearchTarget", "Book")
+//                    .queryParam("output", "JS")
+//                    .queryParam("Version", "20131101")
+//                    .toUriString();
+//
+//            try {
+//                ItemSearchResponse response = restTemplate.getForObject(url, ItemSearchResponse.class);
+//                if (response != null && response.getItem() != null) {
+//                    List<Book> books = AladinConverter.toBookEntityList(response.getItem());
+//                    List<Book> filtered = books.stream()
+//                            .filter(book -> !bookRepository.existsById(book.getIsbn()))
+//                            .toList();
+//                    bookListService.saveAllBooks(filtered);
+//                    log.info("✅ [카테고리 {}] page {}: {}권 저장 완료", categoryId, page, filtered.size());
+//                }
+//            } catch (Exception e) {
+//                log.error("❌ [카테고리 {}] page {} 실패: {}", categoryId, page, e.getMessage());
+//            }
+//        }
+//    }
 
 }

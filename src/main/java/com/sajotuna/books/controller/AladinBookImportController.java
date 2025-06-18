@@ -19,12 +19,12 @@ public class AladinBookImportController {
 
     }
 
-    @PostMapping("/import-by-category")
-    public ResponseEntity<String> importByCategory(
-            @RequestParam Integer categoryId,
-            @RequestParam int page
-    ) {
-        importService.importBooksByCategoryId(categoryId, page);
-        return ResponseEntity.ok(" 카테고리 '" + categoryId + "' 도서 수집 완료");
-    }
+//    @PostMapping("/import-by-category")
+//    public ResponseEntity<String> importByCategory(
+//            @RequestParam Integer categoryId,
+//            @RequestParam int page
+//    ) {
+//        importService.importBooksByCategoryId(categoryId, page);
+//        return ResponseEntity.ok(" 카테고리 '" + categoryId + "' 도서 수집 완료");
+//    }
 }
