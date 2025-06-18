@@ -6,47 +6,35 @@ import com.sajotuna.books.dto.LikeResponse;
 import com.sajotuna.books.exception.BookNotFoundException; // 변경
 import com.sajotuna.books.exception.DuplicateLikeException; // 변경
 import com.sajotuna.books.exception.LikeNotFoundException; // 변경
-import com.sajotuna.books.exception.UserNotFoundException; // 변경
 import com.sajotuna.books.model.Book;
 import com.sajotuna.books.model.Like;
-import com.sajotuna.books.model.User;
 import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.LikeRepository;
-import com.sajotuna.books.repository.UserRepository;
 import com.sajotuna.books.service.LikeService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class LikeServiceImpl implements LikeService {
 
     private final LikeRepository likeRepository;
-    private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    public LikeServiceImpl(LikeRepository likeRepository, UserRepository userRepository, BookRepository bookRepository) {
-        this.likeRepository = likeRepository;
-        this.userRepository = userRepository;
-        this.bookRepository = bookRepository;
-    }
-
     @Override
-    public LikeResponse addLike(LikeRequest likeRequest) {
-        User user = userRepository.findById(likeRequest.getUserId())
-                .orElseThrow(() -> new UserNotFoundException(likeRequest.getUserId())); // 예외 변경
+    public LikeResponse addLike(Long userId, LikeRequest likeRequest) {
         Book book = bookRepository.findById(likeRequest.getBookIsbn())
                 .orElseThrow(() -> new BookNotFoundException(likeRequest.getBookIsbn())); // 예외 변경
 
-        if (likeRepository.findByUserIdAndBookIsbn(user.getId(), book.getIsbn()).isPresent()) {
-            throw new DuplicateLikeException(user.getId(), book.getIsbn()); // 예외 변경
+        if (likeRepository.findByUserIdAndBookIsbn(userId, book.getIsbn()).isPresent()) {
+            throw new DuplicateLikeException(userId, book.getIsbn()); // 예외 변경
         }
 
-        Like like = new Like(user, book);
+        Like like = new Like(userId, book);
         Like savedLike = likeRepository.save(like);
 
         book.setLikes(book.getLikes() != null ? book.getLikes() + 1 : 1);
@@ -70,9 +58,6 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public List<BookResponse> getLikedBooksByUserId(Long userId) {
-        // userId가 유효한지 확인하고 싶다면 아래 주석 해제
-        // userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
         List<Like> likes = likeRepository.findByUserId(userId);
         return likes.stream()
                 .map(Like::getBook)

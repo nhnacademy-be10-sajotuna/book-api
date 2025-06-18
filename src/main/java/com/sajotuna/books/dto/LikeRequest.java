@@ -9,6 +9,5 @@ import lombok.Setter; // 이 부분이 올바르게 임포트되어 있는지 �
 @Setter // 이 어노테이션도 함께 있는 것이 일반적입니다.
 @NoArgsConstructor
 public class LikeRequest {
-    private Long userId;    // 필드 이름이 'userId'인지 정확히 확인
     private String bookIsbn; // 필드 이름이 'bookIsbn'인지 정확히 확인
 }
