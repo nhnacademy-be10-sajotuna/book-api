@@ -17,16 +17,15 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false) // User 엔티티와 연결
-    private User user;
+    @Column(nullable = false)
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_isbn", nullable = false) // Book 엔티티와 연결
     private Book book;
 
-    public Like(User user, Book book) {
-        this.user = user;
+    public Like(Long userId, Book book) {
+        this.userId = userId;
         this.book = book;
     }
 }

@@ -18,8 +18,7 @@ public class LikeResponse {
 
     public LikeResponse(Like like) {
         this.id = like.getId();
-        this.userId = like.getUser().getId();
-        this.username = like.getUser().getUsername();
+        this.userId = like.getUserId();
         this.bookIsbn = like.getBook().getIsbn();
         this.bookTitle = like.getBook().getTitle();
     }

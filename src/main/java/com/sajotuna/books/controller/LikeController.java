@@ -26,8 +26,8 @@ public class LikeController {
      * Request Body: { "userId": 1, "bookIsbn": "978-0321765723" }
      */
     @PostMapping
-    public ResponseEntity<LikeResponse> addLike(@RequestBody LikeRequest likeRequest) {
-        LikeResponse response = likeService.addLike(likeRequest);
+    public ResponseEntity<LikeResponse> addLike(@RequestHeader("X-User-Id") Long userId ,@RequestBody LikeRequest likeRequest) {
+        LikeResponse response = likeService.addLike(userId, likeRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -36,7 +36,7 @@ public class LikeController {
      * DELETE /api/likes?userId=1&bookIsbn=978-0321765723
      */
     @DeleteMapping
-    public ResponseEntity<Void> removeLike(@RequestParam Long userId, @RequestParam String bookIsbn) {
+    public ResponseEntity<Void> removeLike(@RequestHeader("X-User-Id") Long userId, @RequestParam String bookIsbn) {
         likeService.removeLike(userId, bookIsbn);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
@@ -46,8 +46,8 @@ public class LikeController {
      * GET /api/likes/user/{userId}
      * 예시: GET /api/likes/user/1
      */
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<BookResponse>> getLikedBooksByUserId(@PathVariable Long userId) {
+    @GetMapping("/user")
+    public ResponseEntity<List<BookResponse>> getLikedBooksByUserId(@RequestHeader("X-User-Id") Long userId) {
         List<BookResponse> likedBooks = likeService.getLikedBooksByUserId(userId);
         if (likedBooks.isEmpty()) {
             return ResponseEntity.noContent().build(); // 좋아요한 책이 없을 경우 204 No Content
@@ -60,7 +60,7 @@ public class LikeController {
      * GET /api/likes/check?userId=1&bookIsbn=978-0321765723
      */
     @GetMapping("/check")
-    public ResponseEntity<Boolean> checkLikeStatus(@RequestParam Long userId, @RequestParam String bookIsbn) {
+    public ResponseEntity<Boolean> checkLikeStatus(@RequestHeader("X-User-Id") Long userId, @RequestParam String bookIsbn) {
         boolean isLiked = likeService.isLiked(userId, bookIsbn);
         return ResponseEntity.ok(isLiked); // 200 OK
     }
