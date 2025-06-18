@@ -9,4 +9,6 @@ public interface BookService {
     List<BookResponse> getAllBooks();
     BookResponse getBookByIsbn(String isbn); // 추가
     BookResponse createBook(BookRequest bookRequest);
+
+
 }

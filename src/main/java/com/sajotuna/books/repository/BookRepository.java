@@ -13,4 +13,8 @@ public interface BookRepository extends JpaRepository<Book, String> { // Book �
 
     // ISBN으로 조회는 JpaRepository 기본 메서드인 findById(String id) 사용 가능
     // Optional<Book> findByIsbn(String isbn); // 직접 정의할 필요 없음
+
+    boolean existsByIsbn(String isbn);
+
+
 }
