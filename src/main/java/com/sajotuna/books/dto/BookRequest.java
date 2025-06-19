@@ -21,7 +21,6 @@ public class BookRequest {
     private Integer pageCount;
     private String imageUrl;
     private String description;
-    private String tableOfContents;
     private Double originalPrice;
     private Double sellingPrice;
     private Boolean giftWrappingAvailable;

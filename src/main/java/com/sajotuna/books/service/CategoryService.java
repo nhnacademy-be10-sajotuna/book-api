@@ -2,6 +2,7 @@ package com.sajotuna.books.service;
 
 import com.sajotuna.books.dto.CategoryRequest; // 추가
 import com.sajotuna.books.dto.CategoryResponse; // 추가
+import com.sajotuna.books.model.Category;
 
 import java.util.List;
 
@@ -11,4 +12,7 @@ public interface CategoryService {
 
     // getAllCategories 메서드 시그니처 변경: List<CategoryResponse>를 반환
     List<CategoryResponse> getAllCategories();
+
+    List<Category> findOrCreateCategories(List<String> categoryNames);
+
 }

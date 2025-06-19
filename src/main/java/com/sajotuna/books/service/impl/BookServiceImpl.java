@@ -5,10 +5,7 @@ import com.sajotuna.books.dto.BookResponse;
 import com.sajotuna.books.exception.BookNotFoundException; // 변경
 import com.sajotuna.books.exception.CategoryNotFoundException; // 변경
 import com.sajotuna.books.exception.TagNotFoundException;
-import com.sajotuna.books.model.Book;
-import com.sajotuna.books.model.BookTag;
-import com.sajotuna.books.model.Category;
-import com.sajotuna.books.model.Tag;
+import com.sajotuna.books.model.*;
 import com.sajotuna.books.repository.BookRepository;
 import com.sajotuna.books.repository.BookTagRepository;
 import com.sajotuna.books.repository.CategoryRepository;
@@ -61,7 +58,6 @@ public class BookServiceImpl implements BookService {
                 bookRequest.getPageCount(),
                 bookRequest.getImageUrl(),
                 bookRequest.getDescription(),
-                bookRequest.getTableOfContents(),
                 bookRequest.getOriginalPrice(),
                 bookRequest.getSellingPrice(),
                 bookRequest.getGiftWrappingAvailable(),
@@ -69,14 +65,16 @@ public class BookServiceImpl implements BookService {
         );
 
         if (bookRequest.getCategoryIds() != null && !bookRequest.getCategoryIds().isEmpty()) {
-            Set<Category> categories = bookRequest.getCategoryIds().stream()
-                    .map(categoryId -> categoryRepository.findById(categoryId)
-                            .orElseThrow(() -> new CategoryNotFoundException(categoryId))) // 예외 변경
-                    .collect(Collectors.toSet());
-            book.setCategories(categories);
-        } else {
-            book.setCategories(new HashSet<>());
+            for (Long categoryId : bookRequest.getCategoryIds()) {
+                Category category = categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+                BookCategory bookCategory = new BookCategory();
+                bookCategory.setBook(book);
+                bookCategory.setCategory(category);
+                book.getBookCategories().add(bookCategory);
+            }
         }
+
         if (bookRequest.getTagIds() != null && !bookRequest.getTagIds().isEmpty()) {
             Set<BookTag> tags = bookRequest.getTagIds().stream()
                     .map(id -> bookTagRepository.findById(id).orElseThrow(() -> new TagNotFoundException(id)))

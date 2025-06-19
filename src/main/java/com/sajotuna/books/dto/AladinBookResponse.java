@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,4 +22,11 @@ public class AladinBookResponse {
     private String cover;
     private String publisher;
     private String categoryName;
+
+    public List<String> getCategoryNames() {
+        if(categoryName == null || categoryName.isBlank()) {
+            return List.of();
+        }
+        return List.of(categoryName.split(">"));
+    }
 }
