@@ -47,6 +47,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(isbn)); // 예외 변경
     }
 
+
     @Override
     public BookResponse createBook(BookRequest bookRequest) {
         Book book = new Book(
@@ -85,4 +86,5 @@ public class BookServiceImpl implements BookService {
         Book savedBook = bookRepository.save(book);
         return new BookResponse(savedBook);
     }
+
 }
