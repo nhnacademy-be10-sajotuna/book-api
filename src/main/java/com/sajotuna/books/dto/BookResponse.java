@@ -1,6 +1,7 @@
 package com.sajotuna.books.dto;
 
 import com.sajotuna.books.model.Book;
+import com.sajotuna.books.model.BookCategory;
 import com.sajotuna.books.model.BookTag;
 import com.sajotuna.books.model.Tag;
 import lombok.Getter;
@@ -24,7 +25,6 @@ public class BookResponse {
     private Integer pageCount; // 추가: 페이지 수
     private String imageUrl; // 추가: 이미지 URL
     private String description;
-    private String tableOfContents;
     private Double originalPrice;
     private Double sellingPrice;
     private Double discountRate; // 할인율은 계산된 값
@@ -42,15 +42,16 @@ public class BookResponse {
         this.pageCount = book.getPageCount(); // 추가
         this.imageUrl = book.getImageUrl(); // 추가
         this.description = book.getDescription();
-        this.tableOfContents = book.getTableOfContents();
         this.originalPrice = book.getOriginalPrice();
         this.sellingPrice = book.getSellingPrice();
         this.discountRate = book.getDiscountRate(); // 계산된 값 사용
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
-        this.categories = book.getCategories().stream()
+        this.categories = book.getBookCategories().stream()
+                .map(BookCategory::getCategory)
                 .map(CategoryResponse::new)
                 .collect(Collectors.toList());
+
         this.tags = book.getBookTags().stream()
                 .map(BookTag::getTag)
                 .map(Tag::getTagName)

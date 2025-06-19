@@ -12,7 +12,6 @@ import lombok.Setter;
 public class LikeResponse {
     private Long id;
     private Long userId;
-    private String username; // 사용자 이름도 포함
     private String bookIsbn;
     private String bookTitle; // 책 제목도 포함
 

@@ -38,10 +38,6 @@ public class Book {
     @Column(name = "description")
     private String description;
 
-    @Lob
-    @Column(name = "table_of_contents")
-    private String tableOfContents;
-
     @Column(name = "original_price")
     private Double originalPrice;
 
@@ -53,14 +49,9 @@ public class Book {
 
     private Integer likes; // 좋아요 수
 
-    // Book 엔티티와 Category 엔티티 간의 다대다 관계
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "book_categories",
-            joinColumns = @JoinColumn(name = "book_isbn"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<Category> categories = new HashSet<>();
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookCategory> bookCategories = new HashSet<>();
+
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> bookTags = new HashSet<>();
@@ -69,7 +60,7 @@ public class Book {
 
     // 생성자 (필요에 따라 추가)
     public Book(String isbn, String title, String author, String publisher, LocalDate publicationDate,
-                Integer pageCount, String imageUrl, String description, String tableOfContents,
+                Integer pageCount, String imageUrl, String description,
                 Double originalPrice, Double sellingPrice, Boolean giftWrappingAvailable, Integer likes) {
         this.isbn = isbn;
         this.title = title;
@@ -79,7 +70,6 @@ public class Book {
         this.pageCount = pageCount;
         this.imageUrl = imageUrl;
         this.description = description;
-        this.tableOfContents = tableOfContents;
         this.originalPrice = originalPrice;
         this.sellingPrice = sellingPrice;
         this.giftWrappingAvailable = giftWrappingAvailable;

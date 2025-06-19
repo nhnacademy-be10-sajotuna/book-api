@@ -3,7 +3,7 @@ POST localhost:10364/api/tags
 Content-Type: application/json
 
 {
-  "tagName": "입문1"
+  "tagName": "문학"
 }
 
 ### 태그 불러오기
