@@ -39,14 +39,6 @@ public class TagServiceImpl implements TagService {
 
 
     /**
-     * 전체 태그 목록 조회
-     */
-    @Override
-    public List<Tag> getAllTags() {
-        return tagRepository.findAll();
-    }
-
-    /**
      * 특정 태그 ID로 조회
      */
     @Override

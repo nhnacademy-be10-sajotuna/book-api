@@ -1,8 +1,6 @@
 package com.sajotuna.books.category.service.impl;
 
-import com.sajotuna.books.category.controller.reqest.CategoryRequest;
 import com.sajotuna.books.category.controller.response.CategoryResponse;
-import com.sajotuna.books.category.exception.CategoryNotFoundException; // 변경
 import com.sajotuna.books.category.domain.Category;
 import com.sajotuna.books.category.repository.CategoryRepository;
 import com.sajotuna.books.category.service.CategoryService;
@@ -21,24 +19,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-    }
-
-    @Override
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
-        Category parentCategory = null;
-        if (categoryRequest.getParentId() != null) {
-            parentCategory = categoryRepository.findById(categoryRequest.getParentId())
-                    .orElseThrow(() -> new CategoryNotFoundException(categoryRequest.getParentId())); // 예외 변경
-        }
-
-        Category category = new Category(
-                null,
-                categoryRequest.getName(),
-                parentCategory
-        );
-
-        Category savedCategory = categoryRepository.save(category);
-        return new CategoryResponse(savedCategory);
     }
 
     @Override

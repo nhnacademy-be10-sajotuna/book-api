@@ -4,6 +4,7 @@ import com.sajotuna.books.book.controller.response.BookResponse;
 import com.sajotuna.books.like.controller.request.LikeRequest;
 import com.sajotuna.books.like.controller.response.LikeResponse;
 import com.sajotuna.books.like.service.LikeService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,18 +23,15 @@ public class LikeController {
 
     /**
      * 좋아요 추가
-     * POST /api/likes
-     * Request Body: { "userId": 1, "bookIsbn": "978-0321765723" }
      */
     @PostMapping
-    public ResponseEntity<LikeResponse> addLike(@RequestHeader("X-User-Id") Long userId ,@RequestBody LikeRequest likeRequest) {
+    public ResponseEntity<LikeResponse> addLike(@RequestHeader("X-User-Id") Long userId ,@Valid @RequestBody LikeRequest likeRequest) {
         LikeResponse response = likeService.addLike(userId, likeRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**
      * 좋아요 취소
-     * DELETE /api/likes?userId=1&bookIsbn=978-0321765723
      */
     @DeleteMapping
     public ResponseEntity<Void> removeLike(@RequestHeader("X-User-Id") Long userId, @RequestParam String bookIsbn) {
@@ -43,8 +41,6 @@ public class LikeController {
 
     /**
      * 특정 사용자가 좋아요한 책 목록 조회
-     * GET /api/likes/user/{userId}
-     * 예시: GET /api/likes/user/1
      */
     @GetMapping("/user")
     public ResponseEntity<List<BookResponse>> getLikedBooksByUserId(@RequestHeader("X-User-Id") Long userId) {
@@ -57,7 +53,6 @@ public class LikeController {
 
     /**
      * 특정 사용자가 특정 책에 좋아요를 눌렀는지 확인
-     * GET /api/likes/check?userId=1&bookIsbn=978-0321765723
      */
     @GetMapping("/check")
     public ResponseEntity<Boolean> checkLikeStatus(@RequestHeader("X-User-Id") Long userId, @RequestParam String bookIsbn) {

@@ -1,9 +1,7 @@
 package com.sajotuna.books.book.controller;
 
 import com.sajotuna.books.book.controller.response.BookResponse;
-import com.sajotuna.books.book.controller.request.BookRequest;
 import com.sajotuna.books.book.service.BookService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,10 +32,4 @@ public class BookController {
         return ResponseEntity.ok(book);
     }
 
-    // 책 등록
-    @PostMapping
-    public ResponseEntity<BookResponse> createBook(@RequestBody BookRequest bookRequest) {
-        BookResponse createdBook = bookService.createBook(bookRequest);
-        return new ResponseEntity<>(createdBook, HttpStatus.CREATED);
-    }
 }

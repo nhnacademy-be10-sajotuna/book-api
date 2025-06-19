@@ -8,7 +8,4 @@ import org.springframework.stereotype.Repository;
 public interface BookRepository extends JpaRepository<Book, String> { // Book 엔티티와 String 타입의 ID (ISBN)
 
 
-    boolean existsByIsbn(String isbn);
-
-
 }
