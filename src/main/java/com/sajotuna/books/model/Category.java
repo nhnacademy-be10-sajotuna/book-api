@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "categories", uniqueConstraints = {
@@ -40,4 +39,16 @@ public class Category {
         this.name = name;
         this.parentCategory = parentCategory;
     }
+
+    public List<Category> getPathFromRoot() {
+        List<Category> path = new ArrayList<>();
+        Category current = this;
+        while (current != null) {
+            path.add(current);
+            current = current.getParentCategory();
+        }
+        Collections.reverse(path); // 부모 → 자식 순
+        return path;
+    }
+
 }

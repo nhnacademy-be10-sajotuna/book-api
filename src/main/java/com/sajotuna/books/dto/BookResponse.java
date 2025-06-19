@@ -30,7 +30,7 @@ public class BookResponse {
     private Double discountRate; // 할인율은 계산된 값
     private Boolean giftWrappingAvailable;
     private Integer likes;
-    private List<CategoryResponse> categories; // 책에 연결된 카테고리
+    private List<List<CategoryResponse>> categories;
     private Set<String> tags; // 책에 연결된 태그
 
     public BookResponse(Book book) {
@@ -47,10 +47,8 @@ public class BookResponse {
         this.discountRate = book.getDiscountRate(); // 계산된 값 사용
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
-        this.categories = book.getBookCategories().stream()
-                .map(BookCategory::getCategory)
-                .map(CategoryResponse::new)
-                .collect(Collectors.toList());
+
+        this.categories = extractCategoryPath(book);
 
         this.tags = book.getBookTags().stream()
                 .map(BookTag::getTag)
@@ -58,4 +56,14 @@ public class BookResponse {
                 .collect(Collectors.toSet());
 
     }
+
+    private static List<List<CategoryResponse>> extractCategoryPath(Book book) {
+        return book.getBookCategories().stream()
+                .map(b -> b.getCategory().getPathFromRoot())
+                .map(categories -> categories.stream()
+                        .map(CategoryResponse::new)
+                        .toList())
+                .toList();
+    }
+
 }
