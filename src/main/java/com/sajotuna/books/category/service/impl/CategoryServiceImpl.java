@@ -2,6 +2,7 @@ package com.sajotuna.books.category.service.impl;
 
 import com.sajotuna.books.category.controller.response.CategoryResponse;
 import com.sajotuna.books.category.domain.Category;
+import com.sajotuna.books.category.exception.CategoryNotFoundException; // 이 부분을 추가해야 합니다.
 import com.sajotuna.books.category.repository.CategoryRepository;
 import com.sajotuna.books.category.service.CategoryService;
 import jakarta.transaction.Transactional;
@@ -51,4 +52,14 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
+    @Override
+    public void deleteCategory(Long id) {
+        // 카테고리가 존재하는지 확인
+        if (!categoryRepository.existsById(id)) {
+            throw new CategoryNotFoundException(id); // CategoryNotFoundException은 새롭게 생성해야 합니다.
+        }
+        // 하위 카테고리 또는 연결된 책이 있다면 삭제 정책에 따라 처리해야 합니다.
+        // 현재는 단순히 삭제합니다. cascade 설정에 따라 관련 BookCategory도 삭제될 수 있습니다.
+        categoryRepository.deleteById(id);
+    }
 }
