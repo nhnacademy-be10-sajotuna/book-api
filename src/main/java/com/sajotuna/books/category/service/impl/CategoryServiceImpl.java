@@ -1,11 +1,15 @@
 package com.sajotuna.books.category.service.impl;
 
+import com.sajotuna.books.category.controller.request.CategoryCreateRequest;
 import com.sajotuna.books.category.controller.response.CategoryResponse;
 import com.sajotuna.books.category.domain.Category;
-import com.sajotuna.books.category.exception.CategoryNotFoundException; // 이 부분을 추가해야 합니다.
+import com.sajotuna.books.category.exception.CategoryNotFoundException;
+import com.sajotuna.books.category.exception.DuplicateCategoryException;
 import com.sajotuna.books.category.repository.CategoryRepository;
 import com.sajotuna.books.category.service.CategoryService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page; // Page 임포트 추가
+import org.springframework.data.domain.Pageable; // Pageable 임포트 추가
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,11 +26,33 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    // 모든 카테고리 조회 (페이지네이션 적용) (수정된 부분)
     @Override
-    public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll().stream()
-                .map(CategoryResponse::new)
-                .collect(Collectors.toList());
+    public Page<CategoryResponse> getAllCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable) // Pageable 객체 사용
+                .map(CategoryResponse::new);
+    }
+
+    // 카테고리 수동 등록 기능
+    @Override
+    public CategoryResponse createCategory(CategoryCreateRequest request) {
+        Category parentCategory = null;
+        if (request.getParentCategoryId() != null) {
+            parentCategory = categoryRepository.findById(request.getParentCategoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException(request.getParentCategoryId()));
+        }
+
+        // 동일한 부모 카테고리 밑에 동일한 이름의 카테고리가 있는지 확인
+        if (categoryRepository.existsByNameAndParentCategory(request.getName(), parentCategory)) {
+            throw new DuplicateCategoryException(request.getName(), request.getParentCategoryId());
+        }
+
+        Category newCategory = new Category();
+        newCategory.setName(request.getName());
+        newCategory.setParentCategory(parentCategory);
+
+        Category savedCategory = categoryRepository.save(newCategory);
+        return new CategoryResponse(savedCategory);
     }
 
 
@@ -56,7 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(Long id) {
         // 카테고리가 존재하는지 확인
         if (!categoryRepository.existsById(id)) {
-            throw new CategoryNotFoundException(id); // CategoryNotFoundException은 새롭게 생성해야 합니다.
+            throw new CategoryNotFoundException(id);
         }
         // 하위 카테고리 또는 연결된 책이 있다면 삭제 정책에 따라 처리해야 합니다.
         // 현재는 단순히 삭제합니다. cascade 설정에 따라 관련 BookCategory도 삭제될 수 있습니다.
