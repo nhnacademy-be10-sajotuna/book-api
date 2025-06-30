@@ -1,0 +1,58 @@
+{
+  "properties": {
+    "isbn": {
+      "type": "keyword"
+    },
+    "title": {
+      "type": "text",
+      "analyzer": "korean_icu_analyzer",
+      "fields": {
+        "jaso": {
+          "type": "text",
+          "analyzer": "jaso_analyzer"
+        },
+        "synonym": {
+          "type": "text",
+          "analyzer": "synonym_analyzer"
+        }
+      }
+    },
+    "description": {
+      "type": "text",
+      "analyzer": "korean_icu_analyzer"
+    },
+    "author": {
+      "type": "text",
+      "analyzer": "korean_icu_analyzer"
+    },
+    "tags": {
+      "type": "keyword"
+    },
+    "publishedDate": {
+      "type": "date",
+      "format": "strict_date"
+    },
+    "sellingPrice": {
+      "type": "double"
+    },
+    "averageRating": {
+      "type": "double"
+    },
+    "reviewCount": {
+      "type": "integer"
+    },
+    "viewCount": {
+      "type": "integer"
+    },
+    "searchCount": {
+      "type": "integer"
+    },
+    "imageUrl": {
+      "type": "text",
+      "index": false
+    },
+    "popularity": {
+      "type": "double"
+    }
+  }
+}

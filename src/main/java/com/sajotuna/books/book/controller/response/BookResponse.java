@@ -32,6 +32,9 @@ public class BookResponse {
     private Integer likes;
     private List<List<CategoryResponse>> categories;
     private Set<String> tags; // 책에 연결된 태그
+    private Double averageRating;
+    private int reviewCount;
+    private int viewCount;
 
     public BookResponse(Book book) {
         this.isbn = book.getIsbn();
@@ -47,6 +50,9 @@ public class BookResponse {
         this.discountRate = book.getDiscountRate(); // 계산된 값 사용
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
+        this.averageRating = book.getAverageRating();
+        this.reviewCount = book.getReviewCount();
+        this.viewCount = book.getViewCount();
 
         this.categories = extractCategoryPath(book);
 
@@ -54,6 +60,7 @@ public class BookResponse {
                 .map(BookTag::getTag)
                 .map(Tag::getTagName)
                 .collect(Collectors.toSet());
+
 
     }
 
@@ -65,5 +72,6 @@ public class BookResponse {
                         .toList())
                 .toList();
     }
+
 
 }

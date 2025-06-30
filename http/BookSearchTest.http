@@ -1,0 +1,4 @@
+### 키워드로 검색
+GET http://localhost:10364/api/search/books?keyword=유아&sortBy=highestPrice&page=0&size=10
+Content-Type: application/json
+

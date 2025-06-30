@@ -7,12 +7,15 @@ import com.sajotuna.books.category.domain.Category;
 import com.sajotuna.books.book.repository.BookRepository;
 import com.sajotuna.books.common.util.AladinConverter;
 import com.sajotuna.books.category.service.CategoryService;
+import com.sajotuna.books.search.BookSearchDocument;
+import com.sajotuna.books.search.repository.BookSearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -24,6 +27,7 @@ public class AladinBookImportService {
     private final BookListService bookListService;
     private final BookRepository bookRepository;
     private final CategoryService categoryService;
+    private final BookSearchRepository bookSearchRepository;
 
     private final String BASE_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
     private final String TTB_KEY = "ttbdlguswn82541342001";
@@ -54,9 +58,15 @@ public class AladinBookImportService {
                             .filter(book -> !bookRepository.existsById(book.getIsbn()))
                             .toList();
 
-                    bookListService.saveAllBooks(books); // 전부 저장
+                    bookListService.saveAllBooks(books); // RDB 저장
+
+                   books.forEach(book ->
+                            bookSearchRepository.save(BookSearchDocument.from(book)));
+
+
                 }
             } catch (Exception e) {
+                log.error("Error while importing books", e);
                 throw new ExternalApiException();
             }
         }

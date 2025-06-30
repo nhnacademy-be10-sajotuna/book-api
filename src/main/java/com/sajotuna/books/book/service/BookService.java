@@ -8,4 +8,6 @@ public interface BookService {
     List<BookResponse> getAllBooks();
 
     BookResponse getBookByIsbn(String isbn); // 추가
+
+    void updateReviewInfo(String isbn, double rating);
 }
