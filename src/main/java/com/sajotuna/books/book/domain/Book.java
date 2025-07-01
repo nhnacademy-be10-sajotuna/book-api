@@ -28,15 +28,12 @@ public class Book {
     @Column(name = "publication_date")
     private LocalDate publicationDate;
 
-    // 추가: 페이지 수
     @Column(name = "page_count")
     private Integer pageCount;
 
-    // 추가: 책 이미지 URL (대량의 바이너리 데이터 대신 URL로 대체)
     @Column(name = "image_url")
     private String imageUrl;
 
-    // @Lob 어노테이션은 CLOB/BLOB 타입에 매핑됩니다.
     @Lob
     @Column(name = "description")
     private String description;
@@ -46,6 +43,9 @@ public class Book {
 
     @Column(name = "selling_price")
     private Double sellingPrice;
+
+    @Column(name = "stock") // 재고 필드 추가
+    private Integer stock;
 
     @Column(name = "gift_wrapping_available")
     private Boolean giftWrappingAvailable;
@@ -64,7 +64,7 @@ public class Book {
     // 생성자 (필요에 따라 추가)
     public Book(String isbn, String title, String author, String publisher, LocalDate publicationDate,
                 Integer pageCount, String imageUrl, String description,
-                Double originalPrice, Double sellingPrice, Boolean giftWrappingAvailable, Integer likes) {
+                Double originalPrice, Double sellingPrice, Integer stock, Boolean giftWrappingAvailable, Integer likes) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
@@ -75,6 +75,7 @@ public class Book {
         this.description = description;
         this.originalPrice = originalPrice;
         this.sellingPrice = sellingPrice;
+        this.stock = stock; // 생성자에 재고 필드 추가
         this.giftWrappingAvailable = giftWrappingAvailable;
         this.likes = likes;
     }
@@ -99,7 +100,18 @@ public class Book {
         this.description = request.getDescription();
         this.originalPrice = request.getOriginalPrice();
         this.sellingPrice = request.getSellingPrice();
+        this.stock = request.getStock(); // 재고 업데이트 추가
         this.giftWrappingAvailable = request.getGiftWrappingAvailable();
         // 좋아요 수는 업데이트 시 변경하지 않음 (따로 관리)
+    }
+
+    // 좋아요 수 업데이트 메서드 추가 (관리자 기능)
+    public void updateLikes(Integer newLikes) {
+        this.likes = newLikes;
+    }
+
+    // 재고 수 업데이트 메서드 추가 (관리자 기능)
+    public void updateStock(Integer newStock) {
+        this.stock = newStock;
     }
 }

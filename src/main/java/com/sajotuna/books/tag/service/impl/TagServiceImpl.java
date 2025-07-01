@@ -20,11 +20,6 @@ public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
 
-    /**
-     * 도서 등록 시 사용되는 내부 전용 메서드
-     * 전달된 태그 이름들 중 이미 존재하는 태그는 재사용하고,
-     * 존재하지 않는 태그는 새로 생성해서 모두 반환합니다.
-     */
     @Override
     public Set<Tag> findOrCreateTags(Set<String> tagNames) {
         Set<Tag> tags = new HashSet<>();
@@ -38,17 +33,11 @@ public class TagServiceImpl implements TagService {
     }
 
 
-    /**
-     * 특정 태그 ID로 조회
-     */
     @Override
     public Optional<Tag> getTagById(Long id) {
         return tagRepository.findById(id);
     }
 
-    /**
-     * 새 태그 등록
-     */
     @Override
     public Tag createTag(String tagName) {
 
@@ -61,9 +50,7 @@ public class TagServiceImpl implements TagService {
         Tag entity = new Tag(tagName);
         return tagRepository.save(entity);
     }
-    /**
-     * 기존 태그 이름 수정
-     */
+
     @Override
     public Tag updateTag(Long id, String newTagName) {
         if (newTagName == null || newTagName.trim().isEmpty()) {
@@ -77,14 +64,13 @@ public class TagServiceImpl implements TagService {
     }
 
 
-    /**
-     * 태그 삭제
-     */
     @Override
     public boolean deleteTag(Long id) {
         if (!tagRepository.existsById(id)) {
             throw new TagNotFoundException(id);
         }
+        // Tag 엔티티의 bookTags 필드에 orphanRemoval = true 설정되어 있으므로
+        // Tag 삭제 시 연결된 BookTag 엔티티들도 자동으로 삭제되어 도서와의 연결이 해제됩니다.
         tagRepository.deleteById(id);
         return true;
     }
