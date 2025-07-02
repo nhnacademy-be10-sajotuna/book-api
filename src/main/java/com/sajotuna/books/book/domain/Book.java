@@ -20,38 +20,37 @@ public class Book {
     @Id
     private String isbn; // 국제 표준 도서 번호
 
+    @Column(length = 1000, nullable = false)
     private String title;
+
+    @Column(length = 1000, nullable = false)
     private String author;
+
+    @Column(length = 1000, nullable = false)
     private String publisher;
 
     @Column(name = "publication_date")
     private LocalDate publicationDate;
 
-    // 추가: 페이지 수
-    @Column(name = "page_count")
     private Integer pageCount;
 
     // 추가: 책 이미지 URL (대량의 바이너리 데이터 대신 URL로 대체)
-    @Column(name = "image_url")
+    @Column(length = 1024)
     private String imageUrl;
 
     // @Lob 어노테이션은 CLOB/BLOB 타입에 매핑됩니다.
     @Lob
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "original_price")
     private Double originalPrice;
 
-    @Column(name = "selling_price")
     private Double sellingPrice;
 
-    @Column(name = "gift_wrapping_available")
     private Boolean giftWrappingAvailable;
 
     private Integer likes; // 좋아요 수
 
-    @Column(name = "view_count", nullable = false)//
+    @Column(nullable = false)//
     private int viewCount;
 
     private double averageRating;
@@ -68,8 +67,6 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> bookTags = new HashSet<>();
-
-
 
     // 생성자 (필요에 따라 추가)
     public Book(String isbn, String title, String author, String publisher, LocalDate publicationDate,

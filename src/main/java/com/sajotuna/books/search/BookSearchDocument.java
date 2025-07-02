@@ -69,6 +69,7 @@ public class BookSearchDocument {
 
     public static BookSearchDocument from(Book book) {
         return BookSearchDocument.builder()
+                .id(book.getIsbn())
                 .isbn(book.getIsbn())
                 .title(book.getTitle())
                 .description(book.getDescription())

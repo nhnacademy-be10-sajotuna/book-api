@@ -40,7 +40,7 @@ public class AladinBookImportService {
                     .queryParam("QueryType", "Keyword")
                     .queryParam("MaxResults", 50)
                     .queryParam("start", page)
-                    .queryParam("SearchTarget", "Book")
+                    .queryParam("SearchTarget", "All")
                     .queryParam("output", "JS")
                     .queryParam("Version", "20131101")
                     .build(false)
@@ -53,15 +53,30 @@ public class AladinBookImportService {
                     List<Book> books = response.getItem().stream()
                             .map(item -> {
                                 List<Category> categories = categoryService.findOrCreateCategories(item.getCategoryNames());
-                                return AladinConverter.toBookEntity(item, List.of(categories.getLast()));
+                                Category last = null;
+                                if (!categories.isEmpty()) {
+                                    last = categories.getLast();
+                                }
+                                return AladinConverter.toBookEntity(item, last);
                             })
                             .filter(book -> !bookRepository.existsById(book.getIsbn()))
                             .toList();
 
                     bookListService.saveAllBooks(books); // RDB 저장
 
-                   books.forEach(book ->
-                            bookSearchRepository.save(BookSearchDocument.from(book)));
+//                   books.forEach(book ->
+//                            bookSearchRepository.save(BookSearchDocument.from(book)));
+
+//                    books.stream()
+//                            .filter(book -> book.getIsbn() == null || book.getIsbn().isBlank())
+//                            .forEach(book -> System.out.println("❗ Invalid ISBN: " + book.getTitle()));
+
+                    bookSearchRepository.saveAll(
+                            books.stream()
+                                    .filter(book -> book.getIsbn() != null && !book.getIsbn().isBlank())
+                                    .map(BookSearchDocument::from)
+                                    .toList()
+                    );
 
 
                 }

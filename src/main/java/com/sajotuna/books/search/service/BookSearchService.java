@@ -50,10 +50,6 @@ public class BookSearchService {
                 sortField = "reviewCount";
                 sortOrder = SortOrder.Desc;
             }
-            case "popularity" -> {
-                sortField = "popularity";
-                sortOrder = SortOrder.Desc;
-            }
             default -> {
                 sortField = "popularity";
                 sortOrder = SortOrder.Desc;
@@ -99,8 +95,8 @@ public class BookSearchService {
         // 여기서 동기화 진행
         bookSearchSynService.updateSearchStats(isbns);
 
-        List<BookSearchResponse> content = documents.stream()
-                .map(BookSearchResponse::from)
+        List<BookSearchResponse> content = hits.getSearchHits().stream()
+                .map(hit -> BookSearchResponse.from(hit.getContent()))
                 .toList();
 
         return new PageImpl<>(content, pageable, hits.getTotalHits());

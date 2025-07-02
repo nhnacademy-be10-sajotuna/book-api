@@ -1,3 +1,7 @@
 ### 키워드로 수집
-POST http://localhost:10364/api/admin/search/import-by-keyword?keyword=아기&page=2
+POST http://localhost:10364/api/admin/search/import-by-keyword?keyword=요리&page=4
+Content-Type: application/json
 
+###
+POST http://localhost:10364/api/admin/search/import-by-keyword?keyword=cook&page=4
+Content-Type: application/json
