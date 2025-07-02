@@ -18,11 +18,16 @@ public interface BookService {
 
     BookResponse updateBook(String isbn, BookCreateRequest request);
 
-    void deleteBook(String isbn);
-
     // 관리자 기능: 도서 재고 수정
     BookResponse updateBookStock(String isbn, Integer stock);
 
     // 관리자 기능: 도서 좋아요 수 수정
     BookResponse updateBookLikes(String isbn, Integer likes);
+
+    BookResponse getBookByIsbn(String isbn); // 추가
+
+    void updateReviewInfo(String isbn, double rating);
+
+    // 도서 삭제 기능 추가
+    void deleteBook(String isbn);
 }

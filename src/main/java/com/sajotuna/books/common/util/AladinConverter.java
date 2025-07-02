@@ -12,7 +12,7 @@ import java.util.List;
 public class AladinConverter {
 
     // Book 하나를 생성 + 해당 Book과 연결할 Category 리스트 전달
-    public static Book toBookEntity(AladinBookResponse response, List<Category> categories) {
+    public static Book toBookEntity(AladinBookResponse response, Category category) {
         Book book = new Book();
         book.setIsbn(response.getIsbn13() != null ? response.getIsbn13() : response.getIsbn());
         book.setTitle(response.getTitle());
@@ -29,13 +29,16 @@ public class AladinConverter {
         book.setLikes(0);
         book.setGiftWrappingAvailable(false);
 
-        for (Category category : categories) {
-            BookCategory bookCategory = new BookCategory();
-            bookCategory.setBook(book);
-            bookCategory.setCategory(category);
-            book.getBookCategories().add(bookCategory);
-        }
-
+//        for (Category category : categories) {
+//            BookCategory bookCategory = new BookCategory();
+//            bookCategory.setBook(book);
+//            bookCategory.setCategory(category);
+//            book.getBookCategories().add(bookCategory);
+//        }
+        BookCategory bookCategory = new BookCategory();
+        bookCategory.setBook(book);
+        bookCategory.setCategory(category);
+        book.getBookCategories().add(bookCategory);
         return book;
     }
 
