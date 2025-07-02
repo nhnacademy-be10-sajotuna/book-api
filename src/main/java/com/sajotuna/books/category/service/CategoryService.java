@@ -12,4 +12,5 @@ public interface CategoryService {
 
     List<Category> findOrCreateCategories(List<String> categoryNames);
 
+    void deleteCategory(Long id); // 추가된 메서드
 }
