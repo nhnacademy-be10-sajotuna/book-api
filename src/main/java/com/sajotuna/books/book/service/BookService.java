@@ -12,14 +12,12 @@ public interface BookService {
     // 검색 및 필터링을 위한 Specification 파라미터 추가
     Page<BookResponse> searchBooks(Specification<Book> spec, Pageable pageable);
 
-    BookResponse getBookByIsbn(String isbn);
-
     BookResponse createBook(BookCreateRequest request);
 
     BookResponse updateBook(String isbn, BookCreateRequest request);
 
     // 관리자 기능: 도서 재고 수정
-    BookResponse updateBookStock(String isbn, Integer stock);
+    void updateBookStock(String isbn, Integer stock);
 
     // 관리자 기능: 도서 좋아요 수 수정
     BookResponse updateBookLikes(String isbn, Integer likes);

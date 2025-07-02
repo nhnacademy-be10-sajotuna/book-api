@@ -28,7 +28,6 @@ public class BookResponse {
     private Double originalPrice;
     private Double sellingPrice;
     private Double discountRate;
-    private Integer stock; // 추가: 재고
     private Boolean giftWrappingAvailable;
     private Integer likes;
     private List<List<CategoryResponse>> categories;
@@ -49,7 +48,6 @@ public class BookResponse {
         this.originalPrice = book.getOriginalPrice();
         this.sellingPrice = book.getSellingPrice();
         this.discountRate = book.getDiscountRate();
-        this.stock = book.getStock(); // 추가
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
         this.averageRating = book.getAverageRating();

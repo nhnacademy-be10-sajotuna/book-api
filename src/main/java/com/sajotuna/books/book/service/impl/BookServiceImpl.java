@@ -8,14 +8,11 @@ import com.sajotuna.books.book.exception.BookNotFoundException; // 변경
 import com.sajotuna.books.book.repository.BookRepository;
 import com.sajotuna.books.search.BookSearchDocument;
 import com.sajotuna.books.search.repository.BookSearchRepository;
-import com.sajotuna.books.tag.repository.BookTagRepository;
-import com.sajotuna.books.category.repository.CategoryRepository;
 import com.sajotuna.books.book.service.BookService;
 import com.sajotuna.books.category.domain.BookCategory;
 import com.sajotuna.books.category.domain.Category;
 import com.sajotuna.books.tag.domain.BookTag;
 import com.sajotuna.books.tag.domain.Tag;
-import com.sajotuna.books.book.repository.BookRepository;
 import com.sajotuna.books.category.service.CategoryService;
 import com.sajotuna.books.like.repository.LikeRepository; // LikeRepository 추가
 import com.sajotuna.books.tag.service.TagService;
@@ -28,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -100,7 +96,6 @@ public class BookServiceImpl implements BookService {
                 request.getDescription(),
                 request.getOriginalPrice(),
                 request.getSellingPrice(),
-                request.getStock(), // 재고 추가
                 request.getGiftWrappingAvailable(),
                 request.getLikes()
         );
@@ -195,12 +190,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse updateBookStock(String isbn, Integer stock) {
+    public void updateBookStock(String isbn, Integer stock) {
         Book book = bookRepository.findById(isbn)
                 .orElseThrow(() -> new BookNotFoundException(isbn));
-        book.updateStock(stock);
-        Book updatedBook = bookRepository.save(book);
-        return new BookResponse(updatedBook);
+        // TODO: 외부 서비스와 연동하여 재고 업데이트
     }
 
     @Override
