@@ -15,6 +15,11 @@ public interface BookService {
     // 도서 수정 기능 추가
     BookResponse updateBook(String isbn, BookCreateRequest request);
 
+    BookResponse getBookByIsbn(String isbn); // 추가
+
+    void updateReviewInfo(String isbn, double rating);
+
     // 도서 삭제 기능 추가
     void deleteBook(String isbn);
+
 }

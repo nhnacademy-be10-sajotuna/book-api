@@ -21,36 +21,46 @@ public class Book {
     @Id
     private String isbn; // 국제 표준 도서 번호
 
+    @Column(length = 1000, nullable = false)
     private String title;
+
+    @Column(length = 1000, nullable = false)
     private String author;
+
+    @Column(length = 1000, nullable = false)
     private String publisher;
 
     @Column(name = "publication_date")
     private LocalDate publicationDate;
 
-    // 추가: 페이지 수
-    @Column(name = "page_count")
     private Integer pageCount;
 
     // 추가: 책 이미지 URL (대량의 바이너리 데이터 대신 URL로 대체)
-    @Column(name = "image_url")
+    @Column(length = 1024)
     private String imageUrl;
 
     // @Lob 어노테이션은 CLOB/BLOB 타입에 매핑됩니다.
     @Lob
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "original_price")
     private Double originalPrice;
 
-    @Column(name = "selling_price")
     private Double sellingPrice;
 
-    @Column(name = "gift_wrapping_available")
     private Boolean giftWrappingAvailable;
 
     private Integer likes; // 좋아요 수
+
+    @Column(nullable = false)//
+    private int viewCount;
+
+    private double averageRating;
+
+    private int reviewCount;
+
+    private int searchCount;
+
+    private double popularity;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookCategory> bookCategories = new HashSet<>();
@@ -58,8 +68,6 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> bookTags = new HashSet<>();
-
-
 
     // 생성자 (필요에 따라 추가)
     public Book(String isbn, String title, String author, String publisher, LocalDate publicationDate,
@@ -77,6 +85,10 @@ public class Book {
         this.sellingPrice = sellingPrice;
         this.giftWrappingAvailable = giftWrappingAvailable;
         this.likes = likes;
+        this.viewCount = 0;
+        this.averageRating = 0.0;
+        this.reviewCount = 0;
+        this.popularity = 0.0;
     }
 
     // 할인율 계산 getter (DTO에 포함될 수 있음)
@@ -86,6 +98,28 @@ public class Book {
             return ((originalPrice - sellingPrice) / originalPrice) * 100.0;
         }
         return 0.0;
+    }
+
+    public void incrementViewCount() {
+        this.viewCount++;
+    }
+
+    public void incrementReviewCount() {
+        this.reviewCount++;
+    }
+
+    public void calculateRating(double rating) {
+        averageRating = ((averageRating*reviewCount) + rating)/ (reviewCount + 1);
+
+        averageRating = Math.round(averageRating * 10.0) / 10.0;
+    }
+
+    public void incrementSearchCount() {
+        this.searchCount++;
+    }
+
+    public void calculatePopularity() {
+        this.popularity = viewCount * 0.7 + searchCount * 0.3;
     }
 
     // 도서 정보 업데이트 메서드 (추가된 부분)
