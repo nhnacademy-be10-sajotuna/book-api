@@ -45,6 +45,9 @@ public class BookCreateRequest {
     @PositiveOrZero(message = "판매가는 0 이상이어야 합니다.")
     private Double sellingPrice;
 
+    @PositiveOrZero(message = "재고는 0 이상이어야 합니다.")
+    private Integer stock = 0; // 재고 필드 추가
+
     private Boolean giftWrappingAvailable = false; // 기본값 제공
     private Integer likes = 0; // 기본값 제공
 

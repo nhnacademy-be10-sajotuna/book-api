@@ -39,7 +39,6 @@ public class Book {
     @Column(length = 1024)
     private String imageUrl;
 
-    // @Lob 어노테이션은 CLOB/BLOB 타입에 매핑됩니다.
     @Lob
     private String description;
 
@@ -135,5 +134,10 @@ public class Book {
         this.sellingPrice = request.getSellingPrice();
         this.giftWrappingAvailable = request.getGiftWrappingAvailable();
         // 좋아요 수는 업데이트 시 변경하지 않음 (따로 관리)
+    }
+
+    // 좋아요 수 업데이트 메서드 추가 (관리자 기능)
+    public void updateLikes(Integer newLikes) {
+        this.likes = newLikes;
     }
 }

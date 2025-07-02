@@ -1,5 +1,6 @@
 package com.sajotuna.books.category.domain;
 
+import com.sajotuna.books.book.domain.Book;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,7 @@ public class Category {
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Category> subCategories = new HashSet<>();
 
+    // orphanRemoval = true 추가: Category 삭제 시 연결된 BookCategory도 함께 삭제
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookCategory> bookCategories = new HashSet<>();
 

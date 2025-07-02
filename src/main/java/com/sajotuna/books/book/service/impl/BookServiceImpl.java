@@ -8,25 +8,23 @@ import com.sajotuna.books.book.exception.BookNotFoundException; // 변경
 import com.sajotuna.books.book.repository.BookRepository;
 import com.sajotuna.books.search.BookSearchDocument;
 import com.sajotuna.books.search.repository.BookSearchRepository;
-import com.sajotuna.books.tag.repository.BookTagRepository;
-import com.sajotuna.books.category.repository.CategoryRepository;
 import com.sajotuna.books.book.service.BookService;
 import com.sajotuna.books.category.domain.BookCategory;
 import com.sajotuna.books.category.domain.Category;
 import com.sajotuna.books.tag.domain.BookTag;
 import com.sajotuna.books.tag.domain.Tag;
-import com.sajotuna.books.book.repository.BookRepository;
 import com.sajotuna.books.category.service.CategoryService;
+import com.sajotuna.books.like.repository.LikeRepository; // LikeRepository 추가
 import com.sajotuna.books.tag.service.TagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification; // 추가
 import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -37,10 +35,17 @@ public class BookServiceImpl implements BookService {
     private final BookSearchRepository bookSearchRepository;
     private final CategoryService categoryService;
     private final TagService tagService;
+    private final LikeRepository likeRepository; // LikeRepository 주입
 
     @Override
     public Page<BookResponse> getAllBooks(Pageable pageable) {
         return bookRepository.findAll(pageable)
+                .map(BookResponse::new);
+    }
+
+    @Override
+    public Page<BookResponse> searchBooks(Specification<Book> spec, Pageable pageable) {
+        return bookRepository.findAll(spec, pageable)
                 .map(BookResponse::new);
     }
 
@@ -172,10 +177,31 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteBook(String isbn) {
         // 1. 해당 ISBN의 책이 존재하는지 확인
-        if (!bookRepository.existsById(isbn)) {
-            throw new BookNotFoundException(isbn);
-        }
-        // 2. 도서 삭제
-        bookRepository.deleteById(isbn);
+        Book book = bookRepository.findById(isbn)
+                .orElseThrow(() -> new BookNotFoundException(isbn));
+
+        // 2. 해당 도서와 연관된 좋아요 데이터를 먼저 삭제 (Book에 @OneToMany likes 매핑이 없을 경우)
+        // 만약 Like 엔티티에 Book으로의 @ManyToOne 단방향 매핑만 있고, Book 엔티티에 Like에 대한 @OneToMany 매핑이 없다면
+        // JPA의 cascade 기능이 작동하지 않으므로, 명시적으로 삭제해야 합니다.
+        // likeRepository.deleteByBook(book); // LikeRepository에 해당 메서드 필요
+
+        // 3. 도서 삭제 (BookCategory, BookTag는 Book 엔티티에 cascade 및 orphanRemoval 설정되어 있어 함께 삭제됨)
+        bookRepository.delete(book);
+    }
+
+    @Override
+    public void updateBookStock(String isbn, Integer stock) {
+        Book book = bookRepository.findById(isbn)
+                .orElseThrow(() -> new BookNotFoundException(isbn));
+        // TODO: 외부 서비스와 연동하여 재고 업데이트
+    }
+
+    @Override
+    public BookResponse updateBookLikes(String isbn, Integer likes) {
+        Book book = bookRepository.findById(isbn)
+                .orElseThrow(() -> new BookNotFoundException(isbn));
+        book.updateLikes(likes);
+        Book updatedBook = bookRepository.save(book);
+        return new BookResponse(updatedBook);
     }
 }
