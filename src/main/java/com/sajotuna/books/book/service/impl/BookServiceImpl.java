@@ -1,4 +1,3 @@
-// src/main/java/com/sajotuna/books/book/service/impl/BookServiceImpl.java
 package com.sajotuna.books.book.service.impl;
 
 
@@ -6,6 +5,7 @@ import com.sajotuna.books.book.controller.request.BookCreateRequest;
 import com.sajotuna.books.book.controller.response.BookResponse;
 import com.sajotuna.books.book.exception.BookNotFoundException;
 import com.sajotuna.books.book.domain.Book;
+import com.sajotuna.books.book.service.BookService;
 import com.sajotuna.books.category.domain.BookCategory;
 import com.sajotuna.books.category.domain.Category;
 import com.sajotuna.books.tag.domain.BookTag;
@@ -13,11 +13,10 @@ import com.sajotuna.books.tag.domain.Tag;
 import com.sajotuna.books.book.repository.BookRepository;
 import com.sajotuna.books.category.service.CategoryService;
 import com.sajotuna.books.tag.service.TagService;
-import com.sajotuna.books.book.service.BookService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page; // 추가
-import org.springframework.data.domain.Pageable; // 추가
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
@@ -35,9 +34,9 @@ public class BookServiceImpl implements BookService {
 
 
     @Override
-    public Page<BookResponse> getAllBooks(Pageable pageable) { // List -> Page, Pageable 추가
-        return bookRepository.findAll(pageable) // Pageable을 파라미터로 넘깁니다.
-                .map(BookResponse::new); // Page<Book>를 Page<BookResponse>로 변환합니다.
+    public Page<BookResponse> getAllBooks(Pageable pageable) {
+        return bookRepository.findAll(pageable)
+                .map(BookResponse::new);
     }
 
     @Override
@@ -100,5 +99,58 @@ public class BookServiceImpl implements BookService {
 
         // 6. 응답 DTO 반환
         return new BookResponse(savedBook);
+    }
+
+    @Override
+    public BookResponse updateBook(String isbn, BookCreateRequest request) {
+        // 1. 해당 ISBN의 책이 존재하는지 확인
+        Book book = bookRepository.findById(isbn)
+                .orElseThrow(() -> new BookNotFoundException(isbn));
+
+        // 2. 도서 정보 업데이트 (Book 엔티티의 updateInfo 메서드 활용)
+        book.updateInfo(request);
+
+        // 3. 카테고리 업데이트 (기존 카테고리 삭제 후 새로 추가)
+        book.getBookCategories().clear(); // 기존 카테고리 연결 제거
+        if (request.getCategoryNames() != null && !request.getCategoryNames().isEmpty()) {
+            List<Category> categories = categoryService.findOrCreateCategories(request.getCategoryNames());
+            Set<BookCategory> newBookCategories = new HashSet<>();
+            for (Category category : categories) {
+                BookCategory bookCategory = new BookCategory();
+                bookCategory.setBook(book);
+                bookCategory.setCategory(category);
+                newBookCategories.add(bookCategory);
+            }
+            book.setBookCategories(newBookCategories);
+        }
+
+        // 4. 태그 업데이트 (기존 태그 삭제 후 새로 추가)
+        book.getBookTags().clear(); // 기존 태그 연결 제거
+        if (request.getTagNames() != null && !request.getTagNames().isEmpty()) {
+            Set<Tag> tags = tagService.findOrCreateTags(request.getTagNames());
+            Set<BookTag> newBookTags = new HashSet<>();
+            for (Tag tag : tags) {
+                BookTag bookTag = new BookTag(tag, book);
+                newBookTags.add(bookTag);
+            }
+            book.setBookTags(newBookTags);
+        }
+
+        // 5. 도서 저장 (변경사항 반영)
+        Book updatedBook = bookRepository.save(book);
+
+        // 6. 응답 DTO 반환
+        return new BookResponse(updatedBook);
+    }
+
+    // 도서 삭제 (추가된 부분)
+    @Override
+    public void deleteBook(String isbn) {
+        // 1. 해당 ISBN의 책이 존재하는지 확인
+        if (!bookRepository.existsById(isbn)) {
+            throw new BookNotFoundException(isbn);
+        }
+        // 2. 도서 삭제
+        bookRepository.deleteById(isbn);
     }
 }

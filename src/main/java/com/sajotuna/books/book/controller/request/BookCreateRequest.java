@@ -1,4 +1,3 @@
-// src/main/java/com/sajotuna/books/book/controller/request/BookCreateRequest.java
 package com.sajotuna.books.book.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-@Setter
+@Setter // BookCreateRequest를 BookUpdateReques로도 재활용하기 위해 Setter 유지
 @NoArgsConstructor
 public class BookCreateRequest {
 

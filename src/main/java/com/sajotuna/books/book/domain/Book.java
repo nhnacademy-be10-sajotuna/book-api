@@ -1,5 +1,6 @@
 package com.sajotuna.books.book.domain;
 
+import com.sajotuna.books.book.controller.request.BookCreateRequest;
 import com.sajotuna.books.category.domain.BookCategory;
 import com.sajotuna.books.tag.domain.BookTag;
 import jakarta.persistence.*;
@@ -85,5 +86,20 @@ public class Book {
             return ((originalPrice - sellingPrice) / originalPrice) * 100.0;
         }
         return 0.0;
+    }
+
+    // 도서 정보 업데이트 메서드 (추가된 부분)
+    public void updateInfo(BookCreateRequest request) {
+        this.title = request.getTitle();
+        this.author = request.getAuthor();
+        this.publisher = request.getPublisher();
+        this.publicationDate = request.getPublicationDate();
+        this.pageCount = request.getPageCount();
+        this.imageUrl = request.getImageUrl();
+        this.description = request.getDescription();
+        this.originalPrice = request.getOriginalPrice();
+        this.sellingPrice = request.getSellingPrice();
+        this.giftWrappingAvailable = request.getGiftWrappingAvailable();
+        // 좋아요 수는 업데이트 시 변경하지 않음 (따로 관리)
     }
 }
