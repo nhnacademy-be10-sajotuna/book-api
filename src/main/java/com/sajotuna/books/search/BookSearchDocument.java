@@ -42,6 +42,10 @@ public class BookSearchDocument {
 
     private Set<String> tags;
 
+    // 새롭게 추가된 부분: 카테고리 이름들을 저장
+    @Field(type = FieldType.Keyword) // 정확한 매칭을 위해 keyword 타입 사용
+    private Set<String> categories;
+
     @Field(type = FieldType.Date)
     private LocalDate publishedDate;
 
@@ -77,6 +81,11 @@ public class BookSearchDocument {
                 .tags(book.getBookTags().stream()
                         .map(bt -> bt.getTag().getTagName())
                         .collect(Collectors.toSet()))
+                // 새롭게 추가된 부분: BookCategory에서 카테고리 이름 추출
+                .categories(book.getBookCategories().stream()
+                        .flatMap(bc -> bc.getCategory().getPathFromRoot().stream()) // 모든 부모 카테고리 이름 포함
+                        .map(c -> c.getName())
+                        .collect(Collectors.toSet()))
                 .publishedDate(book.getPublicationDate())
                 .sellingPrice(book.getSellingPrice())
                 .averageRating(book.getAverageRating())
@@ -84,10 +93,7 @@ public class BookSearchDocument {
                 .viewCount(book.getViewCount())
                 .searchCount(book.getSearchCount())
                 .popularity(book.getPopularity())
-                .imageUrl(book.getImageUrl())// 검색 횟수는 처음엔 0
+                .imageUrl(book.getImageUrl())
                 .build();
     }
-
-
 }
-
