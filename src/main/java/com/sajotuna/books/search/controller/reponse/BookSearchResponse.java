@@ -3,6 +3,7 @@ package com.sajotuna.books.search.controller.reponse;
 import com.sajotuna.books.search.BookSearchDocument;
 
 import java.time.LocalDate;
+import java.util.Set; // Set 추가
 
 public record BookSearchResponse(
         String isbn,
@@ -14,8 +15,8 @@ public record BookSearchResponse(
         Double popularity,
         LocalDate publishedDate,
         Integer reviewCount,
-        int searchCount
-
+        int searchCount,
+        Set<String> categories // 새롭게 추가된 부분
 ) {
     public static BookSearchResponse from(BookSearchDocument bookSearchDocument) {
         return new BookSearchResponse(
@@ -28,7 +29,8 @@ public record BookSearchResponse(
                 bookSearchDocument.getPopularity(),
                 bookSearchDocument.getPublishedDate(),
                 bookSearchDocument.getReviewCount(),
-                bookSearchDocument.getSearchCount()
+                bookSearchDocument.getSearchCount(),
+                bookSearchDocument.getCategories() // 새롭게 추가된 부분
         );
     }
 }

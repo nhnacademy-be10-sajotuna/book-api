@@ -1,7 +1,12 @@
 package com.sajotuna.books.search.service;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query; // Query 임포트 추가
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
+import com.sajotuna.books.category.domain.Category;
+import com.sajotuna.books.category.exception.CategoryNotFoundException;
+import com.sajotuna.books.category.repository.CategoryRepository;
 import com.sajotuna.books.search.BookSearchDocument;
 import com.sajotuna.books.search.controller.reponse.BookSearchResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +21,7 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +29,9 @@ public class BookSearchService {
 
     private final ElasticsearchOperations operations;
     private final BookSearchSynService bookSearchSynService;
+    private final CategoryRepository categoryRepository;
 
-    public Page<BookSearchResponse> search(String keyword, int page, int size, String sort, Pageable pageable) {
+    public Page<BookSearchResponse> search(String keyword, int page, int size, String sort, Long categoryId, Pageable pageable) {
 
         String sortField;
         SortOrder sortOrder;
@@ -56,30 +63,42 @@ public class BookSearchService {
             }
         }
 
+        // BoolQuery Builder를 사용하여 must와 filter 조건을 동적으로 추가
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder()
+                .must(m -> m.multiMatch(mm -> mm
+                        .query(keyword)
+                        .fields(
+                                "title^100",
+                                "title.synonym^80",
+                                "title.jaso^70",
+                                "description^10",
+                                "tags^50",
+                                "author^30"
+                        )
+                        .type(TextQueryType.BestFields)
+                ));
+
+        // 카테고리 ID가 제공되면 필터 조건 추가
+        if (categoryId != null) {
+            // categoryId로 Category 엔티티를 찾아 해당 카테고리 이름을 가져옵니다.
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+            // BookSearchDocument의 categories 필드에 저장되는 방식과 일치하도록
+            // 해당 카테고리의 이름으로 필터링합니다.
+            boolQueryBuilder.filter(f -> f.term(t -> t.field("categories").value(category.getName())));
+        }
+
         NativeQuery query = NativeQuery.builder()
                 .withTrackScores(false)
-                .withQuery(q -> q.bool(b -> b
-                        .must(m -> m.multiMatch(mm -> mm
-                                .query(keyword)
-                                .fields(
-                                        "title^100",
-                                        "title.synonym^80",
-                                        "title.jaso^70",
-                                        "description^10",
-                                        "tags^50",
-                                        "author^30"
-                                )
-                                .type(TextQueryType.BestFields)
-                        ))
-                ))
-
+                // 오류 해결: 이미 빌드된 BoolQuery 객체를 Query.of()로 감싸서 withQuery에 전달합니다.
+                .withQuery(Query.of(q -> q.bool(boolQueryBuilder.build())))
                 .withSort(s -> s.field(f -> f
                         .field(sortField)
                         .order(sortOrder)
                 ))
                 .withPageable(PageRequest.of(page, size))
                 .build();
-
 
 
         SearchHits<BookSearchDocument> hits = operations.search(query, BookSearchDocument.class);
@@ -90,7 +109,7 @@ public class BookSearchService {
 
         List<String> isbns = documents.stream()
                 .map(BookSearchDocument::getIsbn)
-                        .toList();
+                .toList();
 
         // 여기서 동기화 진행
         bookSearchSynService.updateSearchStats(isbns);

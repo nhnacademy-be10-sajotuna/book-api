@@ -23,10 +23,10 @@ public class BookSearchController {
     @GetMapping("/books")
     public Page<BookSearchResponse> searchBooks(
             @RequestParam String keyword,
+            @RequestParam(required = false) Long categoryId, // 새롭게 추가된 부분
             @RequestParam(defaultValue = "popularity") String sort,
             Pageable pageable
     ){
-        return bookSearchService.search(keyword,pageable.getPageNumber(),pageable.getPageSize(),sort,pageable);
+        return bookSearchService.search(keyword, pageable.getPageNumber(), pageable.getPageSize(), sort, categoryId, pageable); // categoryId 파라미터 전달
     }
-
 }
