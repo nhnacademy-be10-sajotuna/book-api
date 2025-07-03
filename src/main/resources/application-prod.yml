@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: book-api
-  config:
-    import: configserver:http://localhost:10379
-  cloud:
-    config:
-      label: dev

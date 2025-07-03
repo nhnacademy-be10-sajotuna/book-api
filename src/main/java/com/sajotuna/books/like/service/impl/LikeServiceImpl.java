@@ -3,9 +3,9 @@ package com.sajotuna.books.like.service.impl;
 import com.sajotuna.books.book.controller.response.BookResponse;
 import com.sajotuna.books.like.controller.request.LikeRequest;
 import com.sajotuna.books.like.controller.response.LikeResponse;
-import com.sajotuna.books.book.exception.BookNotFoundException;
-import com.sajotuna.books.like.exception.DuplicateLikeException;
-import com.sajotuna.books.like.exception.LikeNotFoundException;
+import com.sajotuna.books.book.exception.BookNotFoundException; // 변경
+import com.sajotuna.books.like.exception.DuplicateLikeException; // 변경
+import com.sajotuna.books.like.exception.LikeNotFoundException; // 변경
 import com.sajotuna.books.book.domain.Book;
 import com.sajotuna.books.like.domain.Like;
 import com.sajotuna.books.book.repository.BookRepository;
@@ -28,16 +28,15 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public LikeResponse addLike(Long userId, LikeRequest likeRequest) {
         Book book = bookRepository.findById(likeRequest.getBookIsbn())
-                .orElseThrow(() -> new BookNotFoundException(likeRequest.getBookIsbn()));
+                .orElseThrow(() -> new BookNotFoundException(likeRequest.getBookIsbn())); // 예외 변경
 
         if (likeRepository.findByUserIdAndBookIsbn(userId, book.getIsbn()).isPresent()) {
-            throw new DuplicateLikeException(userId, book.getIsbn());
+            throw new DuplicateLikeException(userId, book.getIsbn()); // 예외 변경
         }
 
         Like like = new Like(userId, book);
         Like savedLike = likeRepository.save(like);
 
-        // 좋아요 수 증가
         book.setLikes(book.getLikes() != null ? book.getLikes() + 1 : 1);
         bookRepository.save(book);
 
@@ -47,13 +46,12 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public void removeLike(Long userId, String bookIsbn) {
         Like existingLike = likeRepository.findByUserIdAndBookIsbn(userId, bookIsbn)
-                .orElseThrow(() -> new LikeNotFoundException(userId, bookIsbn));
+                .orElseThrow(() -> new LikeNotFoundException(userId, bookIsbn)); // 예외 변경
 
         likeRepository.delete(existingLike);
 
         Book book = bookRepository.findById(bookIsbn)
-                .orElseThrow(() -> new BookNotFoundException(bookIsbn));
-        // 좋아요 수 감소 (null 체크 및 0 미만 방지)
+                .orElseThrow(() -> new BookNotFoundException(bookIsbn)); // 예외 발생 시키지 않도록 하려면 필요
         book.setLikes(book.getLikes() != null && book.getLikes() > 0 ? book.getLikes() - 1 : 0);
         bookRepository.save(book);
     }

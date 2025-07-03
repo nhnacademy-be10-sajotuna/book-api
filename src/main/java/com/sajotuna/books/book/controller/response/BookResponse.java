@@ -22,12 +22,12 @@ public class BookResponse {
     private String author;
     private String publisher;
     private LocalDate publicationDate;
-    private Integer pageCount;
-    private String imageUrl;
+    private Integer pageCount; // 추가: 페이지 수
+    private String imageUrl; // 추가: 이미지 URL
     private String description;
     private Double originalPrice;
     private Double sellingPrice;
-    private Double discountRate;
+    private Double discountRate; // 할인율은 계산된 값
     private Boolean giftWrappingAvailable;
     private Integer likes;
     private List<List<CategoryResponse>> categories;
@@ -42,12 +42,12 @@ public class BookResponse {
         this.author = book.getAuthor();
         this.publisher = book.getPublisher();
         this.publicationDate = book.getPublicationDate();
-        this.pageCount = book.getPageCount();
-        this.imageUrl = book.getImageUrl();
+        this.pageCount = book.getPageCount(); // 추가
+        this.imageUrl = book.getImageUrl(); // 추가
         this.description = book.getDescription();
         this.originalPrice = book.getOriginalPrice();
         this.sellingPrice = book.getSellingPrice();
-        this.discountRate = book.getDiscountRate();
+        this.discountRate = book.getDiscountRate(); // 계산된 값 사용
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
         this.averageRating = book.getAverageRating();
