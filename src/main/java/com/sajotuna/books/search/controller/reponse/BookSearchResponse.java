@@ -11,10 +11,10 @@ public record BookSearchResponse(
         Double sellingPrice,
         Double averageRating,
         String imageUrl,
-        Double popularity,
-        LocalDate publishedDate,
-        Integer reviewCount,
-        int searchCount
+        Double popularity,//
+        LocalDate publishedDate,//
+        Integer reviewCount,//
+        int searchCount//
 
 ) {
     public static BookSearchResponse from(BookSearchDocument bookSearchDocument) {

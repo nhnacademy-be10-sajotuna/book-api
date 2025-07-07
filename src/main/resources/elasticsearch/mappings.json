@@ -53,6 +53,9 @@
     },
     "popularity": {
       "type": "double"
+    },
+    "categoryIds": {
+      "type" : "keyword"
     }
   }
 }

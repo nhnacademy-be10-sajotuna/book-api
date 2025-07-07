@@ -20,13 +20,24 @@ public class BookSearchController {
 
     private final BookSearchService bookSearchService;
 
-    @GetMapping("/books")
-    public Page<BookSearchResponse> searchBooks(
+    @GetMapping("/keyword")
+    public Page<BookSearchResponse> searchByKeyword(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "popularity") String sort,
             Pageable pageable
     ){
         return bookSearchService.search(keyword,pageable.getPageNumber(),pageable.getPageSize(),sort,pageable);
     }
+
+    @GetMapping("/categories")
+    public Page<BookSearchResponse> searchByCategory(
+            @RequestParam String category,
+            @RequestParam(defaultValue = "popularity") String sort,
+            Pageable pageable
+    ){
+        return bookSearchService.searchByCategoryId(category,pageable.getPageNumber(),pageable.getPageSize(),sort,pageable);
+    }
+
+
 
 }
