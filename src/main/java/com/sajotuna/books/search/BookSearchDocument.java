@@ -2,12 +2,14 @@ package com.sajotuna.books.search;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sajotuna.books.book.domain.Book;
+import com.sajotuna.books.category.domain.Category;
 import org.springframework.data.annotation.Id;
 
 import lombok.*;
 import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,8 +68,16 @@ public class BookSearchDocument {
     @Field(type = FieldType.Double)
     private Double popularity;
 
+    @Field(type = FieldType.Keyword)
+    private Set<Long> categoryIds;
+
 
     public static BookSearchDocument from(Book book) {
+        Set<Long> categoryIds = book.getBookCategories().stream()
+                .map(bookCategory -> bookCategory.getCategory().getPathFromRoot())
+                .flatMap(i -> i.stream().map(Category::getId))
+                .collect(Collectors.toSet());
+
         return BookSearchDocument.builder()
                 .id(book.getIsbn())
                 .isbn(book.getIsbn())
@@ -84,7 +94,8 @@ public class BookSearchDocument {
                 .viewCount(book.getViewCount())
                 .searchCount(book.getSearchCount())
                 .popularity(book.getPopularity())
-                .imageUrl(book.getImageUrl())// 검색 횟수는 처음엔 0
+                .imageUrl(book.getImageUrl())
+                .categoryIds(categoryIds)
                 .build();
     }
 

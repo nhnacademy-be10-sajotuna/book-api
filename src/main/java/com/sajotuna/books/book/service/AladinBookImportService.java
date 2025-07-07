@@ -53,23 +53,17 @@ public class AladinBookImportService {
                     List<Book> books = response.getItem().stream()
                             .map(item -> {
                                 List<Category> categories = categoryService.findOrCreateCategories(item.getCategoryNames());
-                                Category last = null;
-                                if (!categories.isEmpty()) {
-                                    last = categories.getLast();
-                                }
-                                return AladinConverter.toBookEntity(item, last);
+//                                Category last = null;
+//                                if (!categories.isEmpty()) {
+//                                    last = categories.getLast();
+//                                }
+                                return AladinConverter.toBookEntity(item, categories);
                             })
                             .filter(book -> !bookRepository.existsById(book.getIsbn()))
                             .toList();
 
                     bookListService.saveAllBooks(books); // RDB 저장
 
-//                   books.forEach(book ->
-//                            bookSearchRepository.save(BookSearchDocument.from(book)));
-
-//                    books.stream()
-//                            .filter(book -> book.getIsbn() == null || book.getIsbn().isBlank())
-//                            .forEach(book -> System.out.println("❗ Invalid ISBN: " + book.getTitle()));
 
                     bookSearchRepository.saveAll(
                             books.stream()

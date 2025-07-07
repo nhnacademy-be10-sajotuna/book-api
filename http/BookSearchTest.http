@@ -1,4 +1,8 @@
 ### 키워드로 검색
-GET http://localhost:10364/api/search/books?keyword=요리&sort=highestPrice&page=0&size=100
-Content-Type: application/jsonx
+GET http://localhost:10364/api/search/keyword?keyword=요리&sort=highestPrice&page=0&size=100
+Content-Type: application/json
+
+###카테고리 검색
+GET http://localhost:10364/api/search/categories?category=3&sort=newest&page=0&size=100
+Content-Type: application/json
 

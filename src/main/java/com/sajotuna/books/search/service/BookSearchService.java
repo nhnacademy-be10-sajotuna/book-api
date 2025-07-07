@@ -2,6 +2,8 @@ package com.sajotuna.books.search.service;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
+import com.sajotuna.books.category.exception.CategoryNotFoundException;
+import com.sajotuna.books.category.exception.InvalidCategoryIdFormatException;
 import com.sajotuna.books.search.BookSearchDocument;
 import com.sajotuna.books.search.controller.reponse.BookSearchResponse;
 import lombok.RequiredArgsConstructor;
@@ -101,4 +103,75 @@ public class BookSearchService {
 
         return new PageImpl<>(content, pageable, hits.getTotalHits());
     }
+
+    public Page<BookSearchResponse> searchByCategoryId(
+        String category,
+        int page,
+        int size,
+        String sort,
+        Pageable pageable
+) {
+        Long categoryId;
+        try {
+            categoryId = Long.parseLong(category);
+        } catch (NumberFormatException e) {
+            throw new InvalidCategoryIdFormatException(category);
+        }
+
+        String sortField;
+        SortOrder sortOrder;
+
+        switch (sort) {
+            case "newest" -> {
+                sortField = "publishedDate";
+                sortOrder = SortOrder.Desc;
+            }
+            case "lowestPrice" -> {
+                sortField = "sellingPrice";
+                sortOrder = SortOrder.Asc;
+            }
+            case "highestPrice" -> {
+                sortField = "sellingPrice";
+                sortOrder = SortOrder.Desc;
+            }
+            case "rating" -> {
+                sortField = "averageRating";
+                sortOrder = SortOrder.Desc;
+            }
+            case "review" -> {
+                sortField = "reviewCount";
+                sortOrder = SortOrder.Desc;
+            }
+            default -> {
+                sortField = "popularity";
+                sortOrder = SortOrder.Desc;
+            }
+        }
+
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(q -> q.term(t -> t
+                        .field("categoryIds")
+                        .value(categoryId)
+                ))
+                .withSort(s -> s.field(f -> f
+                        .field(sortField)
+                        .order(sortOrder)
+                ))
+                .withPageable(PageRequest.of(page, size))
+                .build();
+
+        SearchHits<BookSearchDocument> hits = operations.search(query, BookSearchDocument.class);
+
+        List<String> isbns = hits.getSearchHits().stream()
+                .map(hit -> hit.getContent().getIsbn())
+                .toList();
+        bookSearchSynService.updateSearchStats(isbns);
+
+        List<BookSearchResponse> content = hits.getSearchHits().stream()
+                .map(hit -> BookSearchResponse.from(hit.getContent()))
+                .toList();
+
+        return new PageImpl<>(content, pageable, hits.getTotalHits());
+    }
 }
+
