@@ -1,6 +1,5 @@
 package com.sajotuna.books.book.service;
 
-import com.sajotuna.books.book.controller.request.AladinStockRequest;
 import com.sajotuna.books.book.controller.response.AladinBookResponse;
 import com.sajotuna.books.book.controller.response.ItemSearchResponse;
 import com.sajotuna.books.book.exception.ExternalApiException;

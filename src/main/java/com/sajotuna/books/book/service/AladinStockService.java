@@ -12,7 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AladinStockService {
 
-    private final AladinFetchService aladinFetchService;
     private final OrderStockClient orderStockClient;
 
     public void syncStockWithOrderApi(List<AladinBookResponse> books) {

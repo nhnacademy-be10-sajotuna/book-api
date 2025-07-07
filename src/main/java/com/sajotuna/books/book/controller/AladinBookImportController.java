@@ -18,13 +18,11 @@ public class AladinBookImportController {
 
     private final AladinFetchService aladinFetchService;
     private final AladinBookImportService aladinBookImportService;
-    private final AladinStockService aladinStockService;
 
     @PostMapping("/import")
     public ResponseEntity<Void> importBooks(@RequestParam String keyword, @RequestParam int totalPages) {
         List<AladinBookResponse> books = aladinFetchService.fetchBooks(keyword, totalPages);
         aladinBookImportService.importBooks(books);
-        aladinStockService.syncStockWithOrderApi(books);
         return ResponseEntity.ok().build();
     }
 

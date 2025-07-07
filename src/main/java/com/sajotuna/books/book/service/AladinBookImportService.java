@@ -9,6 +9,7 @@ import com.sajotuna.books.common.util.AladinConverter;
 import com.sajotuna.books.category.service.CategoryService;
 import com.sajotuna.books.search.BookSearchDocument;
 import com.sajotuna.books.search.repository.BookSearchRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class AladinBookImportService {
     private final BookSearchRepository bookSearchRepository;
     private final AladinStockService aladinStockService;
 
-
+    @Transactional
     public void importBooks(List<AladinBookResponse> responses) {
         List<Book> books = responses.stream()
                 .map(item -> {
