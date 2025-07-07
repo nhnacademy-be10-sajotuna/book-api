@@ -118,6 +118,12 @@
             <version>3.4.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>
