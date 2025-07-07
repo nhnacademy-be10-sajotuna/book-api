@@ -11,14 +11,13 @@ import java.util.Set;
 
 public interface TagService {
 
-    // 도서등록시 여러태그 한꺼번에 등록 or 재사용?????
     Set<Tag> findOrCreateTags(Set<String> tagNames);
 
     Optional<Tag> getTagById(Long id);
     Tag createTag(String tagName);
     Tag updateTag(Long id, String newTagName);
+    // 태그가 삭제가 되면 해당 태그가 연결된 도서들의 연결도 같이 삭제가 되어야 한다.
     boolean deleteTag(Long id);
     Page<TagResponse> getAllTags(Pageable pageable);
 
 }
-

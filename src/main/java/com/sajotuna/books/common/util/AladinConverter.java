@@ -35,7 +35,10 @@ public class AladinConverter {
             bookCategory.setCategory(category);
             book.getBookCategories().add(bookCategory);
         }
-
+//        BookCategory bookCategory = new BookCategory();
+//        bookCategory.setBook(book);
+//        bookCategory.setCategory(category);
+//        book.getBookCategories().add(bookCategory);
         return book;
     }
 
