@@ -1,7 +1,7 @@
 package com.sajotuna.books.book.service;
 
 import com.sajotuna.books.book.OrderStockClient;
-import com.sajotuna.books.book.controller.request.AladinStockRequest;
+import com.sajotuna.books.book.controller.request.StockRequest;
 import com.sajotuna.books.book.controller.response.AladinBookResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,13 +16,13 @@ public class AladinStockService {
 
     public void syncStockWithOrderApi(List<AladinBookResponse> books) {
 
-        List<AladinStockRequest> stockRequests = books.stream()
+        List<StockRequest> stockRequests = books.stream()
                 .filter(book -> book.getStock() != null && book.getStock() > 0)
-                .map(book -> new AladinStockRequest(book.getIsbn(), book.getStock()))
+                .map(book -> new StockRequest(book.getIsbn(), book.getStock()))
                 .toList();
 
         if (!stockRequests.isEmpty()) {
-            orderStockClient.updateStock(stockRequests);
+            orderStockClient.createStocks(stockRequests);
         }
     }
 }

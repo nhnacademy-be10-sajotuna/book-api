@@ -41,8 +41,12 @@ public class AladinBookImportService {
 
                     bookListService.saveAllBooks(books); // RDB 저장
 
-                   books.forEach(book ->
-                            bookSearchRepository.save(BookSearchDocument.from(book)));
+                    bookSearchRepository.saveAll(
+                            books.stream()
+                                .filter(book -> book.getIsbn() != null && !book.getIsbn().isBlank())
+                                .map(BookSearchDocument::from)
+                                .toList()
+        );
 
                    aladinStockService.syncStockWithOrderApi(responses);
 
