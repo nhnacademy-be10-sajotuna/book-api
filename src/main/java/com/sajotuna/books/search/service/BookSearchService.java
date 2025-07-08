@@ -58,31 +58,48 @@ public class BookSearchService {
             }
         }
 
-        NativeQuery query = NativeQuery.builder()
-                .withTrackScores(false)
-                .withQuery(q -> q.bool(b -> b
-                        .must(m -> m.multiMatch(mm -> mm
-                                .query(keyword)
-                                .fields(
-                                        "title^100",
-                                        "title.synonym^80",
-                                        "title.jaso^70",
-                                        "description^10",
-                                        "tags^50",
-                                        "author^30"
-                                )
-                                .type(TextQueryType.BestFields)
-                        ))
-                ))
+        NativeQuery query;
 
-                .withSort(s -> s.field(f -> f
-                        .field(sortField)
-                        .order(sortOrder)
-                ))
-                .withPageable(PageRequest.of(page, size))
-                .build();
-
-
+        if (keyword == null || keyword.isBlank()) {
+            //  전체 검색 처리
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.matchAll(m -> m))
+                    .withSort(s -> s.field(f -> f
+                            .field(sortField)
+                            .order(sortOrder)
+                    ))
+                    .withPageable(PageRequest.of(page, size))
+                    .build();
+        } else {
+            //  키워드 검색 처리
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.bool(b -> b
+                            .should(s -> s.matchPhrase(mp -> mp// 책 제목에 대응하는 정확한 책 찾기
+                                    .field("title")
+                                    .query(keyword)
+                                    .boost(300f)
+                            ))
+                            .should(s -> s.multiMatch(mm -> mm
+                                    .query(keyword)
+                                    .fields(List.of(
+                                            "title^100",
+                                            "title.synonym^80",
+                                            "title.jaso^70",
+                                            "description^10",
+                                            "tags^50",
+                                            "author^30"
+                                    ))
+                                    .type(TextQueryType.BestFields)
+                                    .operator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
+                            ))
+                    ))
+                    .withSort(s -> s.field(f -> f
+                            .field(sortField)
+                            .order(sortOrder)
+                    ))
+                    .withPageable(PageRequest.of(page, size))
+                    .build();
+        }
 
         SearchHits<BookSearchDocument> hits = operations.search(query, BookSearchDocument.class);
 
@@ -111,6 +128,11 @@ public class BookSearchService {
         String sort,
         Pageable pageable
 ) {
+        if (category == null || category.isBlank()) {
+            // 카테고리 미지정 시 전체 검색
+            return search(null, page, size, sort, pageable);
+        }
+
         Long categoryId;
         try {
             categoryId = Long.parseLong(category);
@@ -173,5 +195,22 @@ public class BookSearchService {
 
         return new PageImpl<>(content, pageable, hits.getTotalHits());
     }
+
+       public List<String> autoCompleteTitle(String keyword) {
+           NativeQuery query = NativeQuery.builder()
+                   .withQuery(q -> q.matchPhrasePrefix(mpp -> mpp
+                           .field("title")
+                           .query(keyword)
+                   ))
+                   .withPageable(PageRequest.of(0, 10))
+                   .build();
+
+           SearchHits<BookSearchDocument> hits = operations.search(query, BookSearchDocument.class);
+           return hits.getSearchHits().stream()
+                   .map(hit -> hit.getContent().getTitle())
+                   .distinct()
+                   .limit(10)
+                   .toList();
+       }
 }
 

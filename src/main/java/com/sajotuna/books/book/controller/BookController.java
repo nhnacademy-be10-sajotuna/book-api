@@ -21,7 +21,6 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    // --- 일반 사용자/조회용 API ---
     // 모든 책 목록 조회 (페이지네이션 적용)
     @GetMapping
     public ResponseEntity<Page<BookResponse>> getAllBooks(Pageable pageable) {

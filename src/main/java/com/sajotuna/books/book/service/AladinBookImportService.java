@@ -36,21 +36,18 @@ public class AladinBookImportService {
                     List<Category> categories = categoryService.findOrCreateCategories(item.getCategoryNames());
                     return AladinConverter.toBookEntity(item, List.of(categories.getLast()));
                 })
-                .filter(book -> !bookRepository.existsById(book.getIsbn()))
+                .filter(book -> !bookRepository.existsById(book.getIsbn()) && !book.getIsbn().isBlank())
                 .toList();
 
-                    bookListService.saveAllBooks(books); // RDB 저장
+        bookListService.saveAllBooks(books); // RDB 저장
 
-                    bookSearchRepository.saveAll(
-                            books.stream()
-                                .filter(book -> book.getIsbn() != null && !book.getIsbn().isBlank())
-                                .map(BookSearchDocument::from)
-                                .toList()
+        bookSearchRepository.saveAll(
+                books.stream()
+//                                .filter(book -> book.getIsbn() != null && !book.getIsbn().isBlank())
+                    .map(BookSearchDocument::from)
+                    .toList()
         );
 
-                   aladinStockService.syncStockWithOrderApi(responses);
-
-        }
-
-
+        aladinStockService.syncStockWithOrderApi(responses);
     }
+}

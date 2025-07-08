@@ -1,8 +1,20 @@
 ### 키워드로 검색
-GET http://localhost:10364/api/search/keyword?keyword=아기&sort=highestPrice&page=0&size=100
+GET http://localhost:10364/api/search/keyword?keyword=아기 &sort=highestPrice&page=0&size=100
+Content-Type: application/json
+
+### 키워드 없이 검색 - 검색 전체 목록 조회
+GET http://localhost:10364/api/search/keyword?sort=highestPrice&page=0&size=100
 Content-Type: application/json
 
 ###카테고리 검색
 GET http://localhost:10364/api/search/categories?category=3&sort=newest&page=0&size=100
 Content-Type: application/json
+
+### 카테고리 아이디 없이 검색 - 검색 전체 목록 조회
+GET http://localhost:10364/api/search/categories?sort=newest&page=0&size=100
+Content-Type: application/json
+
+### 자동완성
+GET http://localhost:10364/api/search/autocomplete?keyword=핑
+
 
