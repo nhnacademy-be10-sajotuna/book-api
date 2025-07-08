@@ -1,7 +1,9 @@
 package com.sajotuna.books.book.service.impl;
 
 
+import com.sajotuna.books.book.OrderStockClient;
 import com.sajotuna.books.book.controller.request.BookCreateRequest;
+import com.sajotuna.books.book.controller.request.StockRequest;
 import com.sajotuna.books.book.controller.response.BookResponse;
 import com.sajotuna.books.book.domain.Book;
 import com.sajotuna.books.book.exception.BookNotFoundException; // 변경
@@ -36,6 +38,7 @@ public class BookServiceImpl implements BookService {
     private final CategoryService categoryService;
     private final TagService tagService;
     private final LikeRepository likeRepository; // LikeRepository 주입
+    private final OrderStockClient orderStockClient;
 
     @Override
     public Page<BookResponse> getAllBooks(Pageable pageable) {
@@ -191,9 +194,13 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void updateBookStock(String isbn, Integer stock) {
-        Book book = bookRepository.findById(isbn)
-                .orElseThrow(() -> new BookNotFoundException(isbn));
+        if (!bookRepository.existsById(isbn)) {
+            throw new BookNotFoundException(isbn);
+        }
         // TODO: 외부 서비스와 연동하여 재고 업데이트
+
+        orderStockClient.updateStock(new StockRequest(isbn,stock));
+
     }
 
     @Override
