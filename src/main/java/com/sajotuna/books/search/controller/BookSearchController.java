@@ -22,7 +22,7 @@ public class BookSearchController {
 
     @GetMapping("/keyword")
     public Page<BookSearchResponse> searchByKeyword(
-            @RequestParam String keyword,
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "popularity") String sort,
             Pageable pageable
     ){
@@ -31,11 +31,16 @@ public class BookSearchController {
 
     @GetMapping("/categories")
     public Page<BookSearchResponse> searchByCategory(
-            @RequestParam String category,
+            @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "popularity") String sort,
             Pageable pageable
     ){
         return bookSearchService.searchByCategoryId(category,pageable.getPageNumber(),pageable.getPageSize(),sort,pageable);
+    }
+
+    @GetMapping("/autocomplete")
+    public List<String> autoComplete(@RequestParam String keyword){
+        return bookSearchService.autoCompleteTitle(keyword);
     }
 
 

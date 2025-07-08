@@ -30,7 +30,7 @@ public class AladinFetchService {
                     .queryParam("QueryType", "Keyword")
                     .queryParam("MaxResults", 50)
                     .queryParam("start", page)
-                    .queryParam("SearchTarget", "Book")
+                    .queryParam("SearchTarget", "All")
                     .queryParam("output", "JS")
                     .queryParam("Version", "20131101")
                     .build(false)
