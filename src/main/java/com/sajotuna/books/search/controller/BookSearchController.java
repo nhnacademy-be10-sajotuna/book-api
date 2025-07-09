@@ -1,6 +1,5 @@
 package com.sajotuna.books.search.controller;
 
-import com.sajotuna.books.book.service.BookService;
 import com.sajotuna.books.search.controller.reponse.BookSearchResponse;
 import com.sajotuna.books.search.service.BookSearchService;
 import lombok.RequiredArgsConstructor;

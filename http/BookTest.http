@@ -1,0 +1,14 @@
+### 다수 책 조회
+POST http://localhost:10364/api/books/batch
+Content-Type: application/json
+
+{
+  "isbns": [
+    "9791194374299",
+    "9791199227835",
+    "9791190405508"
+  ]
+}
+
+### 책 상세 조회
+GET http://localhost:10364/api/books/9791194374299

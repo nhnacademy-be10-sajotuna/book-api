@@ -26,9 +26,4 @@ public class BookCategory {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
-
-
-
-
-
 }
