@@ -104,8 +104,8 @@ public class BookServiceImpl implements BookService {
         );
 
         // 3. 카테고리 처리
-        if (request.getCategoryNames() != null && !request.getCategoryNames().isEmpty()) {
-            List<Category> categories = categoryService.findOrCreateCategories(request.getCategoryNames());
+        if (request.getCategories() != null && !request.getCategories().isEmpty()) {
+            List<Category> categories = categoryService.findAllByCategoryIds(request.getCategories());
             Set<BookCategory> bookCategories = new HashSet<>();
             for (Category category : categories) {
                 BookCategory bookCategory = new BookCategory();
@@ -117,8 +117,12 @@ public class BookServiceImpl implements BookService {
         }
 
         // 4. 태그 처리
+        Set<String> tagNames = new HashSet<>();
+        List<String> tagList = List.of(request.getTagNames().split(","));
+        tagList.forEach(tagName -> tagNames.add(tagName.trim()));
+
         if (request.getTagNames() != null && !request.getTagNames().isEmpty()) {
-            Set<Tag> tags = tagService.findOrCreateTags(request.getTagNames());
+            Set<Tag> tags = tagService.findOrCreateTags(tagNames);
             Set<BookTag> bookTags = new HashSet<>();
             for (Tag tag : tags) {
                 BookTag bookTag = new BookTag(tag, book);
@@ -145,8 +149,8 @@ public class BookServiceImpl implements BookService {
 
         // 3. 카테고리 업데이트 (기존 카테고리 삭제 후 새로 추가)
         book.getBookCategories().clear(); // 기존 카테고리 연결 제거
-        if (request.getCategoryNames() != null && !request.getCategoryNames().isEmpty()) {
-            List<Category> categories = categoryService.findOrCreateCategories(request.getCategoryNames());
+        if (request.getCategories() != null && !request.getCategories().isEmpty()) {
+            List<Category> categories = categoryService.findAllByCategoryIds(request.getCategories());
             Set<BookCategory> newBookCategories = new HashSet<>();
             for (Category category : categories) {
                 BookCategory bookCategory = new BookCategory();
@@ -159,8 +163,12 @@ public class BookServiceImpl implements BookService {
 
         // 4. 태그 업데이트 (기존 태그 삭제 후 새로 추가)
         book.getBookTags().clear(); // 기존 태그 연결 제거
+
+        Set<String> tagNames = new HashSet<>();
+        List<String> tagList = List.of(request.getTagNames().split(","));
+        tagList.forEach(tagName -> tagNames.add(tagName.trim()));
         if (request.getTagNames() != null && !request.getTagNames().isEmpty()) {
-            Set<Tag> tags = tagService.findOrCreateTags(request.getTagNames());
+            Set<Tag> tags = tagService.findOrCreateTags(tagNames);
             Set<BookTag> newBookTags = new HashSet<>();
             for (Tag tag : tags) {
                 BookTag bookTag = new BookTag(tag, book);

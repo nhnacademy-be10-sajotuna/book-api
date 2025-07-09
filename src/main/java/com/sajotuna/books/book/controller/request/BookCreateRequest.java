@@ -3,16 +3,13 @@ package com.sajotuna.books.book.controller.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
-@Getter
-@Setter // BookCreateRequest를 BookUpdateReques로도 재활용하기 위해 Setter 유지
+@Data
 @NoArgsConstructor
 public class BookCreateRequest {
 
@@ -48,6 +45,6 @@ public class BookCreateRequest {
     private Boolean giftWrappingAvailable = false; // 기본값 제공
     private Integer likes = 0; // 기본값 제공
 
-    private List<String> categoryNames; // 카테고리 이름 목록 (계층 구조)
-    private Set<String> tagNames; // 태그 이름 목록
+    private List<Long> categories; // 카테고리 이름 목록 (계층 구조)
+    private String tagNames; // 태그 이름 목록
 }
