@@ -37,6 +37,10 @@ public class BookSearchDocument {
     )
     private String title;
 
+    @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer", searchAnalyzer = "standard")
+    private String titleAutocomplete;
+
+
     private String description;
 
     @Field(type = FieldType.Text, analyzer = "korean_icu_analyzer")
@@ -82,6 +86,7 @@ public class BookSearchDocument {
                 .id(book.getIsbn())
                 .isbn(book.getIsbn())
                 .title(book.getTitle())
+                .titleAutocomplete(book.getTitle())
                 .description(book.getDescription())
                 .author(book.getAuthor())
                 .tags(book.getBookTags().stream()

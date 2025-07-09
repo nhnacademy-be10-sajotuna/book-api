@@ -199,7 +199,7 @@ public class BookSearchService {
        public List<String> autoCompleteTitle(String keyword) {
            NativeQuery query = NativeQuery.builder()
                    .withQuery(q -> q.matchPhrasePrefix(mpp -> mpp
-                           .field("title")
+                           .field("titleAutocomplete")
                            .query(keyword)
                    ))
                    .withPageable(PageRequest.of(0, 10))
