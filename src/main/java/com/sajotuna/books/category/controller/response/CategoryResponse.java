@@ -9,11 +9,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CategoryResponse {
+
     private Long id;
     private String name;
+    private Long parentId;
 
     public CategoryResponse(Category category) {
         this.id = category.getId();
         this.name = category.getName();
+        if(category.getParentCategory() != null) {
+            this.parentId = category.getParentCategory().getId();
+        }
+
     }
 }
