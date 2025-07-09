@@ -117,11 +117,10 @@ public class BookServiceImpl implements BookService {
         }
 
         // 4. 태그 처리
-        Set<String> tagNames = new HashSet<>();
-        List<String> tagList = List.of(request.getTagNames().split(","));
-        tagList.forEach(tagName -> tagNames.add(tagName.trim()));
-
         if (request.getTagNames() != null && !request.getTagNames().isEmpty()) {
+            Set<String> tagNames = new HashSet<>();
+            List<String> tagList = List.of(request.getTagNames().split(","));
+            tagList.forEach(tagName -> tagNames.add(tagName.trim()));
             Set<Tag> tags = tagService.findOrCreateTags(tagNames);
             Set<BookTag> bookTags = new HashSet<>();
             for (Tag tag : tags) {
@@ -163,11 +162,10 @@ public class BookServiceImpl implements BookService {
 
         // 4. 태그 업데이트 (기존 태그 삭제 후 새로 추가)
         book.getBookTags().clear(); // 기존 태그 연결 제거
-
-        Set<String> tagNames = new HashSet<>();
-        List<String> tagList = List.of(request.getTagNames().split(","));
-        tagList.forEach(tagName -> tagNames.add(tagName.trim()));
         if (request.getTagNames() != null && !request.getTagNames().isEmpty()) {
+            Set<String> tagNames = new HashSet<>();
+            List<String> tagList = List.of(request.getTagNames().split(","));
+            tagList.forEach(tagName -> tagNames.add(tagName.trim()));
             Set<Tag> tags = tagService.findOrCreateTags(tagNames);
             Set<BookTag> newBookTags = new HashSet<>();
             for (Tag tag : tags) {
