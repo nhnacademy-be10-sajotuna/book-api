@@ -37,7 +37,7 @@ public class BookSearchDocument {
     )
     private String title;
 
-    @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer", searchAnalyzer = "standard")
+    @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer", searchAnalyzer = "autocomplete_search_analyzer")
     private String titleAutocomplete;
 
 
