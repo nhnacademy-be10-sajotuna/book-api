@@ -75,6 +75,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> findAllByCategoryIds(List<Long> categoryIds) {
+        return categoryRepository.findByIdIn(categoryIds).get();
+    }
+
+    @Override
     public void deleteCategory(Long id) {
         // 카테고리가 존재하는지 확인
         if (!categoryRepository.existsById(id)) {

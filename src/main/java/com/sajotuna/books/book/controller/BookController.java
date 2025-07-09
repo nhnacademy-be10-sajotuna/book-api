@@ -1,13 +1,9 @@
 package com.sajotuna.books.book.controller;
 
-import com.sajotuna.books.book.controller.request.BookCreateRequest;
 import com.sajotuna.books.book.controller.response.BookResponse;
 import com.sajotuna.books.book.service.BookService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

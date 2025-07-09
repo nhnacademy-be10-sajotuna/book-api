@@ -17,6 +17,8 @@ public interface CategoryService {
 
     List<Category> findOrCreateCategories(List<String> categoryNames);
 
+    List<Category> findAllByCategoryIds(List<Long> categoryIds);
+
     // 해당 카테고리에 속한 도서들은 카테고리 삭제와 동시에 연결을 해제 시킨다.
     void deleteCategory(Long id);
 }
