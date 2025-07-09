@@ -17,13 +17,6 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    // 모든 책 목록 조회 (페이지네이션 적용)
-    @GetMapping
-    public ResponseEntity<Page<BookResponse>> getAllBooks(Pageable pageable) {
-        Page<BookResponse> books = bookService.getAllBooks(pageable);
-        return ResponseEntity.ok(books);
-    }
-
     // 특정 책 상세 정보 조회
     @GetMapping("/{isbn}")
     public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
