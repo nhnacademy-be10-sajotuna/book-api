@@ -4,6 +4,7 @@ import com.sajotuna.books.book.controller.response.AladinBookResponse;
 import com.sajotuna.books.book.controller.response.ItemSearchResponse;
 import com.sajotuna.books.book.exception.ExternalApiException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -11,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AladinFetchService {
@@ -36,6 +38,7 @@ public class AladinFetchService {
                     .build(false)
                     .toUriString();
 
+            log.info("import url: {}", url);
             try {
                 ItemSearchResponse response = restTemplate.getForObject(url, ItemSearchResponse.class);
                 if (response != null && response.getItem() != null) {

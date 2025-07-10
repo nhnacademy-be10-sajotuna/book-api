@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +34,14 @@ public class AladinBookImportService {
     public void importBooks(List<AladinBookResponse> responses) {
         List<Book> books = responses.stream()
                 .map(item -> {
+                    log.info("response: {}", item);
                     List<Category> categories = categoryService.findOrCreateCategories(item.getCategoryNames());
-                    return AladinConverter.toBookEntity(item, List.of(categories.getLast()));
+                    if (categories == null || categories.isEmpty()) {
+                        return Optional.<Book>empty();
+                    }
+                    return Optional.of(AladinConverter.toBookEntity(item, List.of(categories.getLast())));
                 })
+                .flatMap(Optional::stream)
                 .filter(book -> !bookRepository.existsById(book.getIsbn()) && !book.getIsbn().isBlank())
                 .toList();
 

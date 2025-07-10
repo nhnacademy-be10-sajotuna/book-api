@@ -3,6 +3,7 @@ package com.sajotuna.books.search;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sajotuna.books.book.domain.Book;
 import com.sajotuna.books.category.domain.Category;
+import com.sajotuna.books.common.util.HangulUtils;
 import org.springframework.data.annotation.Id;
 
 import lombok.*;
@@ -39,6 +40,9 @@ public class BookSearchDocument {
 
     @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer", searchAnalyzer = "autocomplete_search_analyzer")
     private String titleAutocomplete;
+
+    @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer", searchAnalyzer = "autocomplete_search_analyzer")
+    private String titleChosung;
 
 
     private String description;
@@ -87,6 +91,7 @@ public class BookSearchDocument {
                 .isbn(book.getIsbn())
                 .title(book.getTitle())
                 .titleAutocomplete(book.getTitle())
+                .titleChosung(HangulUtils.extractChosung(book.getTitle()))
                 .description(book.getDescription())
                 .author(book.getAuthor())
                 .tags(book.getBookTags().stream()
