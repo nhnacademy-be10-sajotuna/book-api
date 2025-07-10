@@ -28,6 +28,12 @@ public class AdminBookController {
         return ResponseEntity.ok(books);
     }
 
+    @GetMapping("/{isbn}")
+    public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
+        BookResponse book = bookService.getBookByIsbnByAdmin(isbn);
+        return ResponseEntity.ok(book);
+    }
+
     @PostMapping
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request) {
         BookResponse newBook = bookService.createBook(request);

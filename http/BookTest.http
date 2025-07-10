@@ -15,3 +15,29 @@ GET http://localhost:10364/api/books/9791194374299
 
 ### 관리자 책 전체 조회
 GET http://localhost:10364/api/admin/books
+
+
+### 관리자의 책 상세 조회
+GET http://localhost:10364/api/admin/books/9791194374299
+
+### 관리자의 책 수정
+PUT http://localhost:10364/api/admin/books/9791194374299
+Content-Type: application/json
+
+{
+  "isbn": "9791194374299",
+  "title": "요리를 한다는 것",
+  "author": "최강록 (지은이)",
+  "publisher": "클",
+  "publicationDate": "2025-06-23",
+  "pageCount": 0,
+  "imageUrl": "https://image.aladin.co.kr/product/36568/61/coversum/k872039245_1.jpg",
+  "description": "〈마스터셰프 코리아2〉의 우승자이자 〈흑백요리사〉 〈냉장고를 부탁해〉 등에 출연한 셰프 최강록의 자전적 에세이. 음식, 요리, 식당, 요리사라는 네 가지 키워드로 지난날과 지금의 일상을 담았다.",
+  "originalPrice": 18000.0,
+  "sellingPrice": 1620.0,
+  "discountRate": 10.0,
+  "giftWrappingAvailable": false,
+  "likes": 0,
+  "categories": [8, 48],
+  "tagNames": "2,3,5"
+}
