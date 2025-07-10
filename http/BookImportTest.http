@@ -1,4 +1,4 @@
 ### 키워드로 수집
-POST http://localhost:10364/api/admin/search/import?keyword=요리&totalPages=4
+POST http://localhost:10364/api/admin/search/import?keyword=java&totalPages=4
 Content-Type: application/json
 

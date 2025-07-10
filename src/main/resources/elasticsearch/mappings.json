@@ -25,6 +25,11 @@
       "analyzer": "autocomplete_analyzer",
       "search_analyzer": "autocomplete_search_analyzer"
     },
+    "titleChosung": {
+      "type": "text",
+      "analyzer": "autocomplete_analyzer",
+      "search_analyzer": "autocomplete_search_analyzer"
+    },
     "description": {
       "type": "text",
       "analyzer": "korean_icu_analyzer"

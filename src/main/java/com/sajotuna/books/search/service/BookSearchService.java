@@ -26,6 +26,10 @@ public class BookSearchService {
     private final ElasticsearchOperations operations;
     private final BookSearchSynService bookSearchSynService;
 
+    private boolean isChosung(String keyword) {
+        return keyword != null && keyword.matches("^[ㄱ-ㅎ]+$");
+    }
+
     public Page<BookSearchResponse> search(String keyword, int page, int size, String sort, Pageable pageable) {
 
         String sortField;
@@ -61,20 +65,44 @@ public class BookSearchService {
         NativeQuery query;
 
         if (keyword == null || keyword.isBlank()) {
-            //  전체 검색 처리
+            // 전체 검색
             query = NativeQuery.builder()
                     .withQuery(q -> q.matchAll(m -> m))
-                    .withSort(s -> s.field(f -> f
-                            .field(sortField)
-                            .order(sortOrder)
+                    .withSort(s -> s.field(f -> f.field(sortField).order(sortOrder)))
+                    .withPageable(PageRequest.of(page, size))
+                    .build();
+        } else if (isChosung(keyword)) {
+            // 초성 검색
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.bool(b -> b
+                            .should(s -> s.matchPhrasePrefix(mp -> mp
+                                    .field("titleChosung")
+                                    .query(keyword)
+                                    .boost(300f)
+                            ))
+                            .should(s -> s.multiMatch(mm -> mm
+                                    .query(keyword)
+                                    .fields(List.of(
+                                            "title^100",
+                                            "title.synonym^80",
+                                            "title.jaso^70",
+                                            "description^10",
+                                            "tags^50",
+                                            "author^30"
+                                    ))
+                                    .type(TextQueryType.BestFields)
+                                    .operator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
+                                    .boost(10f)
+                            ))
                     ))
+                    .withSort(s -> s.field(f -> f.field(sortField).order(sortOrder)))
                     .withPageable(PageRequest.of(page, size))
                     .build();
         } else {
-            //  키워드 검색 처리
+            // 기존 일반 검색
             query = NativeQuery.builder()
                     .withQuery(q -> q.bool(b -> b
-                            .should(s -> s.matchPhrase(mp -> mp// 책 제목에 대응하는 정확한 책 찾기
+                            .should(s -> s.matchPhrase(mp -> mp
                                     .field("title")
                                     .query(keyword)
                                     .boost(300f)
@@ -93,10 +121,7 @@ public class BookSearchService {
                                     .operator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
                             ))
                     ))
-                    .withSort(s -> s.field(f -> f
-                            .field(sortField)
-                            .order(sortOrder)
-                    ))
+                    .withSort(s -> s.field(f -> f.field(sortField).order(sortOrder)))
                     .withPageable(PageRequest.of(page, size))
                     .build();
         }
@@ -196,21 +221,38 @@ public class BookSearchService {
         return new PageImpl<>(content, pageable, hits.getTotalHits());
     }
 
-       public List<String> autoCompleteTitle(String keyword) {
-           NativeQuery query = NativeQuery.builder()
-                   .withQuery(q -> q.matchPhrasePrefix(mpp -> mpp
-                           .field("titleAutocomplete")
-                           .query(keyword)
-                   ))
-                   .withPageable(PageRequest.of(0, 10))
-                   .build();
+    public List<String> autoCompleteTitle(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
 
-           SearchHits<BookSearchDocument> hits = operations.search(query, BookSearchDocument.class);
-           return hits.getSearchHits().stream()
-                   .map(hit -> hit.getContent().getTitle())
-                   .distinct()
-                   .limit(10)
-                   .toList();
-       }
+        NativeQuery query;
+
+        if (isChosung(keyword)) {
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.matchPhrasePrefix(mpp -> mpp
+                            .field("titleChosung")
+                            .query(keyword)
+                    ))
+                    .withPageable(PageRequest.of(0, 10))
+                    .build();
+        } else {
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.matchPhrasePrefix(mpp -> mpp
+                            .field("titleAutocomplete")
+                            .query(keyword)
+                    ))
+                    .withPageable(PageRequest.of(0, 10))
+                    .build();
+        }
+
+        SearchHits<BookSearchDocument> hits = operations.search(query, BookSearchDocument.class);
+        return hits.getSearchHits().stream()
+                .map(hit -> hit.getContent().getTitle())
+                .distinct()
+                .limit(10)
+                .toList();
+    }
+
 }
 

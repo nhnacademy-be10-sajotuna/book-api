@@ -8,8 +8,7 @@
         "token_chars": [
           "letter",
           "digit",
-          "whitespace",
-          "hangul"
+          "whitespace"
         ]
       }
     },
