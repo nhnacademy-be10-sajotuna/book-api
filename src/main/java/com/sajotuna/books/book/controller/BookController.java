@@ -1,11 +1,16 @@
 package com.sajotuna.books.book.controller;
 
+import com.sajotuna.books.book.controller.request.BookBatchRequest;
 import com.sajotuna.books.book.controller.response.BookResponse;
+import com.sajotuna.books.book.controller.response.BookSummaryResponse;
 import com.sajotuna.books.book.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/books") // RequestMapping 변경
@@ -22,5 +27,11 @@ public class BookController {
     public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
         BookResponse book = bookService.getBookByIsbn(isbn);
         return ResponseEntity.ok(book);
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<List<BookSummaryResponse>> getBooksByIsbns(@RequestBody @Valid BookBatchRequest request) {
+        List<BookSummaryResponse> books = bookService.getBooksByIsbns(request);
+        return ResponseEntity.ok(books);
     }
 }

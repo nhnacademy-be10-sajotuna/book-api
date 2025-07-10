@@ -1,11 +1,15 @@
 package com.sajotuna.books.book.service;
 
+import com.sajotuna.books.book.controller.request.BookBatchRequest;
 import com.sajotuna.books.book.controller.request.BookCreateRequest;
 import com.sajotuna.books.book.controller.response.BookResponse;
+import com.sajotuna.books.book.controller.response.BookSummaryResponse;
 import com.sajotuna.books.book.domain.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification; // 추가
+
+import java.util.List;
 
 public interface BookService {
     Page<BookResponse> getAllBooks(Pageable pageable);
@@ -28,4 +32,6 @@ public interface BookService {
 
     // 도서 삭제 기능 추가
     void deleteBook(String isbn);
+
+    List<BookSummaryResponse> getBooksByIsbns(BookBatchRequest request);
 }

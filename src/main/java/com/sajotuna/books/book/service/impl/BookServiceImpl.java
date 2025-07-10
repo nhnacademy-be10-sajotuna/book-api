@@ -2,9 +2,11 @@ package com.sajotuna.books.book.service.impl;
 
 
 import com.sajotuna.books.book.OrderStockClient;
+import com.sajotuna.books.book.controller.request.BookBatchRequest;
 import com.sajotuna.books.book.controller.request.BookCreateRequest;
 import com.sajotuna.books.book.controller.request.StockRequest;
 import com.sajotuna.books.book.controller.response.BookResponse;
+import com.sajotuna.books.book.controller.response.BookSummaryResponse;
 import com.sajotuna.books.book.domain.Book;
 import com.sajotuna.books.book.exception.BookNotFoundException; // 변경
 import com.sajotuna.books.book.repository.BookRepository;
@@ -196,6 +198,25 @@ public class BookServiceImpl implements BookService {
 
         // 3. 도서 삭제 (BookCategory, BookTag는 Book 엔티티에 cascade 및 orphanRemoval 설정되어 있어 함께 삭제됨)
         bookRepository.delete(book);
+    }
+
+    @Override
+    public List<BookSummaryResponse> getBooksByIsbns(BookBatchRequest request) {
+        List<Book> books = bookRepository.findAllById(request.getIsbns());
+        if (books.isEmpty()) {
+            throw new BookNotFoundException("해당 ISBN의 도서가 없습니다.");
+        }
+
+        return books.stream()
+                .map(book ->{
+                    List<Long> categoryIds = book.getBookCategories().stream()
+                            .flatMap(bookCategory -> bookCategory.getCategory().getPathFromRoot().stream())
+                            .map(Category::getId)
+                            .distinct()
+                            .toList();
+                    return BookSummaryResponse.from(book, categoryIds);
+                })
+                .toList();
     }
 
     @Override
