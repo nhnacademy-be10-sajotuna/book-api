@@ -22,7 +22,8 @@ public interface BookService {
     // 관리자 기능: 도서 좋아요 수 수정
     BookResponse updateBookLikes(String isbn, Integer likes);
 
-    BookResponse getBookByIsbn(String isbn); // 추가
+    // isAdmin 파라미터 추가
+    BookResponse getBookByIsbn(String isbn, boolean isAdmin); // 수정
 
     void updateReviewInfo(String isbn, double rating);
 

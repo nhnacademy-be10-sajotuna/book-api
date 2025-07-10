@@ -53,15 +53,16 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse getBookByIsbn(String isbn) {
+    public BookResponse getBookByIsbn(String isbn, boolean isAdmin) { // isAdmin 파라미터 추가
         Book book = bookRepository.findById(isbn)
                 .orElseThrow(() -> new BookNotFoundException(isbn));
 
-        book.incrementViewCount();
-        book.calculatePopularity();
-
-        bookRepository.save(book); //db 반영
-        bookSearchRepository.save(BookSearchDocument.from(book)); // Es 반영
+        if (!isAdmin) { // 관리자가 아닐 때만 조회수 증가
+            book.incrementViewCount();
+            book.calculatePopularity();
+            bookRepository.save(book); //db 반영
+            bookSearchRepository.save(BookSearchDocument.from(book)); // Es 반영
+        }
         return new BookResponse(book);
     }
 

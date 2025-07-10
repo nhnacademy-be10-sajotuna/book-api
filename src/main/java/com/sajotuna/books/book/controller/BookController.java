@@ -19,8 +19,11 @@ public class BookController {
 
     // 특정 책 상세 정보 조회
     @GetMapping("/{isbn}")
-    public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
-        BookResponse book = bookService.getBookByIsbn(isbn);
+    public ResponseEntity<BookResponse> getBookByIsbn(
+            @PathVariable String isbn,
+            @RequestHeader(value = "X-Is-Admin", defaultValue = "false") boolean isAdmin // 관리자 여부 헤더 추가
+    ) {
+        BookResponse book = bookService.getBookByIsbn(isbn, isAdmin); // isAdmin 파라미터 추가
         return ResponseEntity.ok(book);
     }
 }
