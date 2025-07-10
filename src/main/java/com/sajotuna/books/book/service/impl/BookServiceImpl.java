@@ -146,6 +146,7 @@ public class BookServiceImpl implements BookService {
         // 5. 도서 저장
         Book savedBook = bookRepository.save(book);
 
+        bookSearchRepository.save(BookSearchDocument.from(book)); // Es 반영
         // 6. 응답 DTO 반환
         return new BookResponse(savedBook);
     }
@@ -184,6 +185,7 @@ public class BookServiceImpl implements BookService {
                 book.getBookTags().add(bookTag);
             }
         }
+        bookSearchRepository.save(BookSearchDocument.from(book)); // Es 반영
 
         // 5. 응답 DTO 반환
         return new BookResponse(book);
@@ -203,13 +205,14 @@ public class BookServiceImpl implements BookService {
 
         // 3. 도서 삭제 (BookCategory, BookTag는 Book 엔티티에 cascade 및 orphanRemoval 설정되어 있어 함께 삭제됨)
         bookRepository.delete(book);
+        bookSearchRepository.deleteById(isbn); // Es 반영
     }
 
     @Override
     public List<BookSummaryResponse> getBooksByIsbns(BookBatchRequest request) {
         List<Book> books = bookRepository.findAllById(request.getIsbns());
         if (books.isEmpty()) {
-            throw new BookNotFoundException("해당 ISBN의 도서가 없습니다.");
+            throw new BookNotFoundException(request.getIsbns().toString());
         }
 
         return books.stream()
