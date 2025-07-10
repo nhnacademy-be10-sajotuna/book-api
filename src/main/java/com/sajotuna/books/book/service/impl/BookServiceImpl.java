@@ -208,7 +208,7 @@ public class BookServiceImpl implements BookService {
     public List<BookSummaryResponse> getBooksByIsbns(BookBatchRequest request) {
         List<Book> books = bookRepository.findAllById(request.getIsbns());
         if (books.isEmpty()) {
-            throw new BookNotFoundException("해당 ISBN의 도서가 없습니다.");
+            throw new BookNotFoundException(request.getIsbns().toString());
         }
 
         return books.stream()
