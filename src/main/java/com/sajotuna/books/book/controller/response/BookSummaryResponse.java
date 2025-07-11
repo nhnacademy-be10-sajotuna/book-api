@@ -15,6 +15,7 @@ public class BookSummaryResponse {
     private String imageUrl;
     private Double originalPrice;
     private Double sellingPrice;
+    private Boolean giftWrappingAvailable;
     private List<Long> categoryIds;
 
     public static BookSummaryResponse from(Book book, List<Long> categoryIds) {
@@ -23,6 +24,7 @@ public class BookSummaryResponse {
                 .imageUrl(book.getImageUrl())
                 .originalPrice(book.getOriginalPrice())
                 .sellingPrice(book.getSellingPrice())
+                .giftWrappingAvailable(book.getGiftWrappingAvailable())
                 .isbn(book.getIsbn())
                 .categoryIds(categoryIds)
                 .build();
