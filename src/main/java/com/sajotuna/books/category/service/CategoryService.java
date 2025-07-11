@@ -13,6 +13,8 @@ public interface CategoryService {
 
     Page<CategoryResponse> getAllCategories(Pageable pageable);
 
+    Page<CategoryResponse> getAllCategoriesByParentId(Pageable pageable, Long parentId);
+
     CategoryResponse createCategory(CategoryCreateRequest request);
 
     List<Category> findOrCreateCategories(List<String> categoryNames);
