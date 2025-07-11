@@ -1,22 +1,22 @@
 package com.sajotuna.books.book.controller.response;
 
-import com.sajotuna.books.category.controller.response.CategoryResponse;
 import com.sajotuna.books.book.domain.Book;
-import com.sajotuna.books.tag.domain.BookTag;
-import com.sajotuna.books.tag.domain.Tag;
+import com.sajotuna.books.category.controller.response.CategoryResponse; // 임포트 추가
+import com.sajotuna.books.category.domain.Category; // 임포트 추가
+import com.sajotuna.books.tag.controller.response.TagResponse; // 임포트 추가
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class BookResponse {
+
     private String isbn;
     private String title;
     private String author;
@@ -30,11 +30,15 @@ public class BookResponse {
     private Double discountRate;
     private Boolean giftWrappingAvailable;
     private Integer likes;
-    private List<List<CategoryResponse>> categories;
-    private Set<String> tags; // 책에 연결된 태그
-    private Double averageRating;
+    private List<List<CategoryResponse>> categories; // 계층 구조를 위해 List<List<CategoryResponse>>로 변경
+    private List<TagResponse> tags;
+    private double averageRating;
     private int reviewCount;
     private int viewCount;
+
+    // --- 추가된 부분 시작 ---
+    private Integer stock; // stock 필드 추가
+    // --- 추가된 부분 끝 ---
 
     public BookResponse(Book book) {
         this.isbn = book.getIsbn();
@@ -54,24 +58,20 @@ public class BookResponse {
         this.reviewCount = book.getReviewCount();
         this.viewCount = book.getViewCount();
 
-        this.categories = extractCategoryPath(book);
-
-        this.tags = book.getBookTags().stream()
-                .map(BookTag::getTag)
-                .map(Tag::getTagName)
-                .collect(Collectors.toSet());
-
-
-    }
-
-    private static List<List<CategoryResponse>> extractCategoryPath(Book book) {
-        return book.getBookCategories().stream()
-                .map(b -> b.getCategory().getPathFromRoot())
-                .map(categories -> categories.stream()
+        // 카테고리 계층 구조 매핑
+        this.categories = book.getBookCategories().stream()
+                .map(bookCategory -> bookCategory.getCategory().getPathFromRoot().stream()
                         .map(CategoryResponse::new)
                         .toList())
-                .toList();
+                .collect(Collectors.toList());
+
+        // 태그 매핑
+        this.tags = book.getBookTags().stream()
+                .map(bookTag -> TagResponse.from(bookTag.getTag()))
+                .collect(Collectors.toList());
+
+        // --- 추가된 부분 시작 ---
+        this.stock = book.getStock(); // book 엔티티에서 stock 값을 가져와 설정
+        // --- 추가된 부분 끝 ---
     }
-
-
 }

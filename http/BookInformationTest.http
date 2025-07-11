@@ -1,0 +1,26 @@
+###카테고리 ID확인
+GET http://localhost:10364/api/categories
+
+###태그 목록 확인
+GET http://localhost:10364/api/tags
+
+###도서 정보 수정
+PUT http://localhost:10364/api/admin/books/8809445900102
+Content-Type: application/json
+
+{
+  "isbn": "8809445900102",
+  "title": "보글보글 요리2",
+  "author": "꿈꾸는달팽이 편집부 (지은이)2",
+  "publisher": "꿈꾸는달팽이(꿈달)2",
+  "publicationDate": "2015-03-22",
+  "pageCount": 300,
+  "imageUrl": "https://image.aladin.co.kr/product/5527/39/coversum/k632433331_1.jpg",
+  "description": "사운드 토이북 시리즈. 주방에서 들을 수 있는 모든 소리와 요리할 때 나는 모든 소리가 담겨 있는 사운드북이다. 프라이팬과 뒤집개, 음식 메뉴 16개, 주방에서 나는 사운드 10가지, 문장 사운드 6가지로 구성되어 있다2.",
+  "originalPrice": 25000.0,
+  "sellingPrice": 22500.0,
+  "giftWrappingAvailable": true,
+  "likes": 50,
+  "categories": [79, 109],
+  "tagNames": "java, spring"
+}

@@ -1,0 +1,7 @@
+###도서 재고 수정
+PATCH http://localhost:10364/api/admin/books/8809445900102/stock?stock=9
+Content-Type: application/json
+
+###도서 수정 확인
+GET http://localhost:10364/api/admin/books/8809445900102
+Content-Type: application/json

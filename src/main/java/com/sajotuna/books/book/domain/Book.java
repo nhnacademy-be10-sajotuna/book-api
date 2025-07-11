@@ -68,6 +68,10 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> bookTags = new HashSet<>();
 
+    // --- 추가된 부분 시작 ---
+    private Integer stock; // 재고 필드 추가
+    // --- 추가된 부분 끝 ---
+
     // 생성자 (필요에 따라 추가)
     public Book(String isbn, String title, String author, String publisher, LocalDate publicationDate,
                 Integer pageCount, String imageUrl, String description,
@@ -88,6 +92,7 @@ public class Book {
         this.averageRating = 0.0;
         this.reviewCount = 0;
         this.popularity = 0.0;
+        this.stock = 0; // 재고 필드 초기화
     }
 
     // 할인율 계산 getter (DTO에 포함될 수 있음)
@@ -134,10 +139,18 @@ public class Book {
         this.sellingPrice = request.getSellingPrice();
         this.giftWrappingAvailable = request.getGiftWrappingAvailable();
         // 좋아요 수는 업데이트 시 변경하지 않음 (따로 관리)
+        // 재고는 여기서 업데이트하지 않음 (따로 관리)
     }
 
     // 좋아요 수 업데이트 메서드 추가 (관리자 기능)
     public void updateLikes(Integer newLikes) {
         this.likes = newLikes;
     }
+
+    // --- 추가된 부분 시작 ---
+    // 재고 업데이트 메서드 추가
+    public void updateStock(Integer newStock) {
+        this.stock = newStock;
+    }
+    // --- 추가된 부분 끝 ---
 }
