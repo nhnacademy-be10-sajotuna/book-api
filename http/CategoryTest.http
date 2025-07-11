@@ -17,3 +17,7 @@ Content-Type: application/json
 ### 전체 카테고리 조회
 GET http://localhost:10364/api/categories
 Accept: application/json
+
+### 부모 카테고리 아이디로 조회
+GET http://localhost:10364/api/categories/parent
+Accept: application/json
