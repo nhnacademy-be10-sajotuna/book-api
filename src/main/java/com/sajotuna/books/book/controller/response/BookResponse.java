@@ -25,8 +25,8 @@ public class BookResponse {
     private Integer pageCount;
     private String imageUrl;
     private String description;
-    private Double originalPrice;
     private Double sellingPrice;
+    private Double originalPrice;
     private Double discountRate;
     private Boolean giftWrappingAvailable;
     private Integer likes;
@@ -45,8 +45,8 @@ public class BookResponse {
         this.pageCount = book.getPageCount();
         this.imageUrl = book.getImageUrl();
         this.description = book.getDescription();
-        this.originalPrice = book.getOriginalPrice();
         this.sellingPrice = book.getSellingPrice();
+        this.originalPrice = book.getOriginalPrice();
         this.discountRate = book.getDiscountRate();
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
