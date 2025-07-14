@@ -59,6 +59,9 @@ public class BookSearchDocument {
     private Double sellingPrice;
 
     @Field(type = FieldType.Double)
+    private Double originalPrice;
+
+    @Field(type = FieldType.Double)
     private Double averageRating;
 
     @Field(type = FieldType.Integer)
@@ -98,6 +101,7 @@ public class BookSearchDocument {
                         .map(bt -> bt.getTag().getTagName())
                         .collect(Collectors.toSet()))
                 .publishedDate(book.getPublicationDate())
+                .originalPrice(book.getOriginalPrice())
                 .sellingPrice(book.getSellingPrice())
                 .averageRating(book.getAverageRating())
                 .reviewCount(book.getReviewCount())

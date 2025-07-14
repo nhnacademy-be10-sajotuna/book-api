@@ -9,6 +9,7 @@ public record BookSearchResponse(
         String title,
         String author,
         Double sellingPrice,
+        Double originalPrice,
         Double averageRating,
         String imageUrl,
         Double popularity,//
@@ -24,6 +25,7 @@ public record BookSearchResponse(
                 bookSearchDocument.getAuthor(),
                 bookSearchDocument.getSellingPrice(),
                 bookSearchDocument.getAverageRating(),
+                bookSearchDocument.getOriginalPrice(),
                 bookSearchDocument.getImageUrl(),
                 bookSearchDocument.getPopularity(),
                 bookSearchDocument.getPublishedDate(),
