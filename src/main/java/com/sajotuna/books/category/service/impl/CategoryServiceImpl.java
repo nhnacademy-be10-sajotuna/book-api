@@ -40,6 +40,23 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<CategoryResponse> getParentCategories(Long id) {
+        Long curId = id;
+        List<CategoryResponse> parentCategories = new ArrayList<>();
+        while (curId != null) {
+            Category curCategory = categoryRepository.findById(curId).orElseThrow(() -> new CategoryNotFoundException(id));
+            parentCategories.addFirst(new CategoryResponse(curCategory));
+            if (curCategory.getParentCategory() != null) {
+                curId = curCategory.getParentCategory().getId();
+            }
+            else {
+                curId = null;
+            }
+        }
+        return parentCategories;
+    }
+
+    @Override
     public CategoryResponse createCategory(CategoryCreateRequest request) {
         Category parentCategory = null;
         if (request.getParentCategoryId() != null) {

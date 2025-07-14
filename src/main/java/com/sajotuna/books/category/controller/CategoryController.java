@@ -29,9 +29,15 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/parent")
+    @GetMapping("/children")
     public ResponseEntity<Page<CategoryResponse>> getAllCategoriesByParent(Pageable pageable, @RequestParam(required = false) Long parentId) {
         Page<CategoryResponse> categories = categoryService.getAllCategoriesByParentId(pageable, parentId);
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/parents")
+    public ResponseEntity<List<CategoryResponse>> getParentCategories(@RequestParam Long id) {
+        List<CategoryResponse> categories = categoryService.getParentCategories(id);
         return ResponseEntity.ok(categories);
     }
 
