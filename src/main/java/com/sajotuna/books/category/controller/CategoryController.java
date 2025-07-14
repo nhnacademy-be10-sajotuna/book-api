@@ -29,6 +29,12 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
+    @GetMapping("/parent")
+    public ResponseEntity<Page<CategoryResponse>> getAllCategoriesByParent(Pageable pageable, @RequestParam(required = false) Long parentId) {
+        Page<CategoryResponse> categories = categoryService.getAllCategoriesByParentId(pageable, parentId);
+        return ResponseEntity.ok(categories);
+    }
+
     // 카테고리 등록
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryCreateRequest request) {

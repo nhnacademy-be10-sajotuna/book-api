@@ -45,6 +45,6 @@ public class BookCreateRequest {
     private Boolean giftWrappingAvailable = false; // 기본값 제공
     private Integer likes = 0; // 기본값 제공
 
-    private List<Long> categories; // 카테고리 이름 목록 (계층 구조)
+    private List<Long> categories; // 카테고리 이름 목록
     private String tagNames; // 태그 이름 목록
 }

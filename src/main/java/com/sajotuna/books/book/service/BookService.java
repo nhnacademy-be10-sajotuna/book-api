@@ -28,6 +28,8 @@ public interface BookService {
 
     BookResponse getBookByIsbn(String isbn); // 추가
 
+    BookResponse getBookByIsbnByAdmin(String isbn);
+
     void updateReviewInfo(String isbn, double rating);
 
     // 도서 삭제 기능 추가

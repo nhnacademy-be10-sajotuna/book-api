@@ -3,8 +3,11 @@ package com.sajotuna.books.tag.domain;
 import com.sajotuna.books.book.domain.Book;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,6 +35,19 @@ public class BookTag {
         this.book = book;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BookTag)) return false;
+        BookTag that = (BookTag) o;
+        return Objects.equals(book.getIsbn(), that.book.getIsbn()) &&
+                Objects.equals(tag.getId(), that.tag.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(book.getIsbn(), tag.getId());
+    }
 
 
 }

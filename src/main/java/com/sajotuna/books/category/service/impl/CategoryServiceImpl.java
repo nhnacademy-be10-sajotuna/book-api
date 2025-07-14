@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class CategoryServiceImpl implements CategoryService {
 
+
+
     private final CategoryRepository categoryRepository;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
@@ -30,6 +32,11 @@ public class CategoryServiceImpl implements CategoryService {
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
         return categoryRepository.findAll(pageable)
                 .map(CategoryResponse::new);
+    }
+
+    @Override
+    public Page<CategoryResponse> getAllCategoriesByParentId(Pageable pageable, Long parentId) {
+        return categoryRepository.findByParentCategoryId(pageable, parentId).map(CategoryResponse::new);
     }
 
     @Override

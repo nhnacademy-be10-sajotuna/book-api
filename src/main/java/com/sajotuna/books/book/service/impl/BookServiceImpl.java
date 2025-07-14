@@ -20,6 +20,7 @@ import com.sajotuna.books.tag.domain.Tag;
 import com.sajotuna.books.category.service.CategoryService;
 import com.sajotuna.books.like.repository.LikeRepository; // LikeRepository 추가
 import com.sajotuna.books.tag.service.TagService;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,7 @@ public class BookServiceImpl implements BookService {
     private final TagService tagService;
     private final LikeRepository likeRepository; // LikeRepository 주입
     private final OrderStockClient orderStockClient;
+    private final EntityManager entityManager;
 
     @Override
     public Page<BookResponse> getAllBooks(Pageable pageable) {
@@ -82,7 +84,16 @@ public class BookServiceImpl implements BookService {
     }
 
 
-    @Override
+
+    @Override // 관리자
+    public BookResponse getBookByIsbnByAdmin(String isbn) {
+        Book book = bookRepository.findById(isbn)
+                .orElseThrow(() -> new BookNotFoundException(isbn));
+        return new BookResponse(book);
+    }
+
+
+    @Override // 관리자
     public BookResponse createBook(BookCreateRequest request) {
         // 1. ISBN 중복 확인
         if (bookRepository.existsById(request.getIsbn())) {
@@ -140,7 +151,7 @@ public class BookServiceImpl implements BookService {
         return new BookResponse(savedBook);
     }
 
-    @Override
+    @Override // 관리자
     public BookResponse updateBook(String isbn, BookCreateRequest request) {
         // 1. 해당 ISBN의 책이 존재하는지 확인
         Book book = bookRepository.findById(isbn)
@@ -153,42 +164,35 @@ public class BookServiceImpl implements BookService {
         book.getBookCategories().clear(); // 기존 카테고리 연결 제거
         if (request.getCategories() != null && !request.getCategories().isEmpty()) {
             List<Category> categories = categoryService.findAllByCategoryIds(request.getCategories());
-            Set<BookCategory> newBookCategories = new HashSet<>();
             for (Category category : categories) {
                 BookCategory bookCategory = new BookCategory();
                 bookCategory.setBook(book);
                 bookCategory.setCategory(category);
-                newBookCategories.add(bookCategory);
+                book.getBookCategories().add(bookCategory);
             }
-            book.setBookCategories(newBookCategories);
         }
 
         // 4. 태그 업데이트 (기존 태그 삭제 후 새로 추가)
         book.getBookTags().clear(); // 기존 태그 연결 제거
+        entityManager.flush();
         if (request.getTagNames() != null && !request.getTagNames().isEmpty()) {
             Set<String> tagNames = new HashSet<>();
             List<String> tagList = List.of(request.getTagNames().split(","));
             tagList.forEach(tagName -> tagNames.add(tagName.trim()));
             Set<Tag> tags = tagService.findOrCreateTags(tagNames);
-            Set<BookTag> newBookTags = new HashSet<>();
             for (Tag tag : tags) {
                 BookTag bookTag = new BookTag(tag, book);
-                newBookTags.add(bookTag);
+                book.getBookTags().add(bookTag);
             }
-            book.setBookTags(newBookTags);
         }
-
-        // 5. 도서 저장 (변경사항 반영)
-        Book updatedBook = bookRepository.save(book);
-
         bookSearchRepository.save(BookSearchDocument.from(book)); // Es 반영
 
-        // 6. 응답 DTO 반환
-        return new BookResponse(updatedBook);
+        // 5. 응답 DTO 반환
+        return new BookResponse(book);
     }
 
     // 도서 삭제 (추가된 부분)
-    @Override
+    @Override // 관리자
     public void deleteBook(String isbn) {
         // 1. 해당 ISBN의 책이 존재하는지 확인
         Book book = bookRepository.findById(isbn)
@@ -208,7 +212,7 @@ public class BookServiceImpl implements BookService {
     public List<BookSummaryResponse> getBooksByIsbns(BookBatchRequest request) {
         List<Book> books = bookRepository.findAllById(request.getIsbns());
         if (books.isEmpty()) {
-            throw new BookNotFoundException("해당 ISBN의 도서가 없습니다.");
+            throw new BookNotFoundException(request.getIsbns().toString());
         }
 
         return books.stream()
