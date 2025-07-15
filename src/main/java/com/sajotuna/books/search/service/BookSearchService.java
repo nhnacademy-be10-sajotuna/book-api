@@ -27,11 +27,10 @@ public class BookSearchService {
     private final BookSearchSynService bookSearchSynService;
 
     private boolean isChosung(String keyword) {
-        return keyword != null && keyword.matches("^[ㄱ-ㅎ]+$");
+        return keyword != null && keyword.matches("^[ㄱ-ㅎ\\\\s]+$");
     }
 
-    public Page<BookSearchResponse> search(String keyword, int page, int size, String sort, Pageable pageable) {
-
+    public Page<BookSearchResponse> search(String keyword, String category, int page, int size, String sort, Pageable pageable) {
         String sortField;
         SortOrder sortOrder;
 
@@ -62,65 +61,68 @@ public class BookSearchService {
             }
         }
 
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+        boolean hasCategory = category != null && !category.isBlank();
+
         NativeQuery query;
 
-        if (keyword == null || keyword.isBlank()) {
+        if (!hasKeyword && !hasCategory) {
             // 전체 검색
             query = NativeQuery.builder()
                     .withQuery(q -> q.matchAll(m -> m))
                     .withSort(s -> s.field(f -> f.field(sortField).order(sortOrder)))
                     .withPageable(PageRequest.of(page, size))
                     .build();
-        } else if (isChosung(keyword)) {
-            // 초성 검색
-            query = NativeQuery.builder()
-                    .withQuery(q -> q.bool(b -> b
-                            .should(s -> s.matchPhrasePrefix(mp -> mp
-                                    .field("titleChosung")
-                                    .query(keyword)
-                                    .boost(300f)
-                            ))
-                            .should(s -> s.multiMatch(mm -> mm
-                                    .query(keyword)
-                                    .fields(List.of(
-                                            "title^100",
-                                            "title.synonym^80",
-                                            "title.jaso^70",
-                                            "description^10",
-                                            "tags^50",
-                                            "author^30"
-                                    ))
-                                    .type(TextQueryType.BestFields)
-                                    .operator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
-                                    .boost(10f)
-                            ))
-                    ))
-                    .withSort(s -> s.field(f -> f.field(sortField).order(sortOrder)))
-                    .withPageable(PageRequest.of(page, size))
-                    .build();
         } else {
-            // 기존 일반 검색
+            // 키워드 or 카테고리 조건 포함 검색
             query = NativeQuery.builder()
-                    .withQuery(q -> q.bool(b -> b
-                            .should(s -> s.matchPhrase(mp -> mp
-                                    .field("title")
-                                    .query(keyword)
-                                    .boost(300f)
-                            ))
-                            .should(s -> s.multiMatch(mm -> mm
-                                    .query(keyword)
-                                    .fields(List.of(
-                                            "title^100",
-                                            "title.synonym^80",
-                                            "title.jaso^70",
-                                            "description^10",
-                                            "tags^50",
-                                            "author^30"
-                                    ))
-                                    .type(TextQueryType.BestFields)
-                                    .operator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
-                            ))
-                    ))
+                    .withQuery(q -> q.bool(b -> {
+                        // keyword 처리
+                        if (hasKeyword) {
+                            if (isChosung(keyword)) {
+                                b.must(m -> m.matchPhrasePrefix(mp -> mp
+                                        .field("titleChosung")
+                                        .query(keyword)
+                                        .boost(300f)
+                                ));
+                            } else {
+                                b.must(m -> m.bool(bb -> bb
+                                        .should(s -> s.matchPhrase(mp -> mp
+                                                .field("title")
+                                                .query(keyword)
+                                                .boost(300f)))
+                                        .should(s -> s.multiMatch(mm -> mm
+                                                .query(keyword)
+                                                .fields(List.of(
+                                                        "title^100",
+                                                        "title.synonym^80",
+                                                        "title.jaso^70",
+                                                        "description^10",
+                                                        "tags^50",
+                                                        "author^30"
+                                                ))
+                                                .type(TextQueryType.BestFields)
+                                                .operator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
+                                        ))
+                                ));
+                            }
+                        }
+
+                        // category 처리
+                        if (hasCategory) {
+                            try {
+                                Long categoryId = Long.parseLong(category);
+                                b.must(m -> m.term(t -> t
+                                        .field("categoryIds")
+                                        .value(categoryId)
+                                ));
+                            } catch (NumberFormatException e) {
+                                throw new InvalidCategoryIdFormatException(category);
+                            }
+                        }
+
+                        return b;
+                    }))
                     .withSort(s -> s.field(f -> f.field(sortField).order(sortOrder)))
                     .withPageable(PageRequest.of(page, size))
                     .build();
@@ -134,92 +136,92 @@ public class BookSearchService {
 
         List<String> isbns = documents.stream()
                 .map(BookSearchDocument::getIsbn)
-                        .toList();
+                .toList();
 
-        // 여기서 동기화 진행
         bookSearchSynService.updateSearchStats(isbns);
 
-        List<BookSearchResponse> content = hits.getSearchHits().stream()
-                .map(hit -> BookSearchResponse.from(hit.getContent()))
+        List<BookSearchResponse> content = documents.stream()
+                .map(BookSearchResponse::from)
                 .toList();
 
         return new PageImpl<>(content, pageable, hits.getTotalHits());
     }
 
-    public Page<BookSearchResponse> searchByCategoryId(
-        String category,
-        int page,
-        int size,
-        String sort,
-        Pageable pageable
-) {
-        if (category == null || category.isBlank()) {
-            // 카테고리 미지정 시 전체 검색
-            return search(null, page, size, sort, pageable);
-        }
 
-        Long categoryId;
-        try {
-            categoryId = Long.parseLong(category);
-        } catch (NumberFormatException e) {
-            throw new InvalidCategoryIdFormatException(category);
-        }
-
-        String sortField;
-        SortOrder sortOrder;
-
-        switch (sort) {
-            case "newest" -> {
-                sortField = "publishedDate";
-                sortOrder = SortOrder.Desc;
-            }
-            case "lowestPrice" -> {
-                sortField = "sellingPrice";
-                sortOrder = SortOrder.Asc;
-            }
-            case "highestPrice" -> {
-                sortField = "sellingPrice";
-                sortOrder = SortOrder.Desc;
-            }
-            case "rating" -> {
-                sortField = "averageRating";
-                sortOrder = SortOrder.Desc;
-            }
-            case "review" -> {
-                sortField = "reviewCount";
-                sortOrder = SortOrder.Desc;
-            }
-            default -> {
-                sortField = "popularity";
-                sortOrder = SortOrder.Desc;
-            }
-        }
-
-        NativeQuery query = NativeQuery.builder()
-                .withQuery(q -> q.term(t -> t
-                        .field("categoryIds")
-                        .value(categoryId)
-                ))
-                .withSort(s -> s.field(f -> f
-                        .field(sortField)
-                        .order(sortOrder)
-                ))
-                .withPageable(PageRequest.of(page, size))
-                .build();
-
-        SearchHits<BookSearchDocument> hits = operations.search(query, BookSearchDocument.class);
-
-        List<String> isbns = hits.getSearchHits().stream()
-                .map(hit -> hit.getContent().getIsbn())
-                .toList();
-        bookSearchSynService.updateSearchStats(isbns);
-
-        List<BookSearchResponse> content = hits.getSearchHits().stream()
-                .map(hit -> BookSearchResponse.from(hit.getContent()))
-                .toList();
-
-        return new PageImpl<>(content, pageable, hits.getTotalHits());
-    }
+//    public Page<BookSearchResponse> searchByCategoryId(
+//        String category,
+//        int page,
+//        int size,
+//        String sort,
+//        Pageable pageable
+//) {
+//        if (category == null || category.isBlank()) {
+//            // 카테고리 미지정 시 전체 검색
+//            return search(null, page, size, sort, pageable);
+//        }
+//
+//        Long categoryId;
+//        try {
+//            categoryId = Long.parseLong(category);
+//        } catch (NumberFormatException e) {
+//            throw new InvalidCategoryIdFormatException(category);
+//        }
+//
+//        String sortField;
+//        SortOrder sortOrder;
+//
+//        switch (sort) {
+//            case "newest" -> {
+//                sortField = "publishedDate";
+//                sortOrder = SortOrder.Desc;
+//            }
+//            case "lowestPrice" -> {
+//                sortField = "sellingPrice";
+//                sortOrder = SortOrder.Asc;
+//            }
+//            case "highestPrice" -> {
+//                sortField = "sellingPrice";
+//                sortOrder = SortOrder.Desc;
+//            }
+//            case "rating" -> {
+//                sortField = "averageRating";
+//                sortOrder = SortOrder.Desc;
+//            }
+//            case "review" -> {
+//                sortField = "reviewCount";
+//                sortOrder = SortOrder.Desc;
+//            }
+//            default -> {
+//                sortField = "popularity";
+//                sortOrder = SortOrder.Desc;
+//            }
+//        }
+//
+//        NativeQuery query = NativeQuery.builder()
+//                .withQuery(q -> q.term(t -> t
+//                        .field("categoryIds")
+//                        .value(categoryId)
+//                ))
+//                .withSort(s -> s.field(f -> f
+//                        .field(sortField)
+//                        .order(sortOrder)
+//                ))
+//                .withPageable(PageRequest.of(page, size))
+//                .build();
+//
+//        SearchHits<BookSearchDocument> hits = operations.search(query, BookSearchDocument.class);
+//
+//        List<String> isbns = hits.getSearchHits().stream()
+//                .map(hit -> hit.getContent().getIsbn())
+//                .toList();
+//        bookSearchSynService.updateSearchStats(isbns);
+//
+//        List<BookSearchResponse> content = hits.getSearchHits().stream()
+//                .map(hit -> BookSearchResponse.from(hit.getContent()))
+//                .toList();
+//
+//        return new PageImpl<>(content, pageable, hits.getTotalHits());
+//    }
 
     public List<String> autoCompleteTitle(String keyword) {
         if (keyword == null || keyword.isBlank()) {
