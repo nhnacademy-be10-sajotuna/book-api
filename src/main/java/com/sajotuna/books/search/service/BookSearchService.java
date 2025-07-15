@@ -27,7 +27,7 @@ public class BookSearchService {
     private final BookSearchSynService bookSearchSynService;
 
     private boolean isChosung(String keyword) {
-        return keyword != null && keyword.matches("^[ㄱ-ㅎ\\\\s]+$");
+        return keyword != null && keyword.matches("^[ㄱ-ㅎ]+$");
     }
 
     public Page<BookSearchResponse> search(String keyword, String category, int page, int size, String sort, Pageable pageable) {

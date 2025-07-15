@@ -1,9 +1,9 @@
 ### 자동완성
-GET http://localhost:10364/api/search/autocomplete?keyword=아
+GET http://localhost:10364/api/search/autocomplete?keyword=ㅇ
 Content-Type: application/json
 
 ### 키워드 & 카테고리로 검색
-GET http://localhost:10364/api/search?keyword=기본기가 탄탄한 개발자&category=1&sort=highestPrice&page=0&size=100
+GET http://localhost:10364/api/search?keyword=기본기가탄탄한개발자&category=1&sort=highestPrice&page=0&size=100
 Content-Type: application/json
 
 ### 전체 검색
