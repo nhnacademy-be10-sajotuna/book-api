@@ -7,10 +7,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+@Slf4j
 @Entity
 @Getter
 @Setter
@@ -108,9 +111,13 @@ public class Book {
     }
 
     public void calculateRating(double rating) {
-        averageRating = ((averageRating*reviewCount) + rating)/ (reviewCount + 1);
-
+        log.info("Calculating rating :{}", rating);
+        log.info("Calculating rating :{}", averageRating);
+        log.info("Calculating rating :{}", reviewCount);
+        averageRating = ((averageRating * reviewCount) + rating) / (reviewCount + 1);
+        log.info("계산 결과 :{}", averageRating);
         averageRating = Math.round(averageRating * 10.0) / 10.0;
+        log.info("최종 결과 :{}", averageRating);
     }
 
     public void incrementSearchCount() {
