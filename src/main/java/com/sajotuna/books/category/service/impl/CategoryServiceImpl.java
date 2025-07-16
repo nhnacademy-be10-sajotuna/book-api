@@ -113,4 +113,26 @@ public class CategoryServiceImpl implements CategoryService {
         // Category 삭제 시 연결된 BookCategory 엔티티들도 자동으로 삭제되어 도서와의 연결이 해제됩니다.
         categoryRepository.deleteById(id);
     }
+    
+    @Override
+    public List<CategoryResponse> getAllSubCategories(Long categoryId) {
+        // 해당 카테고리가 존재하는지 확인
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new CategoryNotFoundException(categoryId);
+        }
+        
+        List<CategoryResponse> result = new ArrayList<>();
+        collectAllSubCategories(categoryId, result);
+        return result;
+    }
+    
+    private void collectAllSubCategories(Long categoryId, List<CategoryResponse> result) {
+        List<Category> subCategories = categoryRepository.findByParentCategoryId(categoryId);
+        
+        for (Category subCategory : subCategories) {
+            result.add(new CategoryResponse(subCategory));
+            // 재귀적으로 하위 카테고리의 하위 카테고리도 조회
+            collectAllSubCategories(subCategory.getId(), result);
+        }
+    }
 }

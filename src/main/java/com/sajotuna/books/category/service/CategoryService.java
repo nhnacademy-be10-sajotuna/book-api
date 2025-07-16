@@ -25,4 +25,7 @@ public interface CategoryService {
 
     // 해당 카테고리에 속한 도서들은 카테고리 삭제와 동시에 연결을 해제 시킨다.
     void deleteCategory(Long id);
+    
+    // 특정 카테고리의 모든 하위 카테고리 조회
+    List<CategoryResponse> getAllSubCategories(Long categoryId);
 }

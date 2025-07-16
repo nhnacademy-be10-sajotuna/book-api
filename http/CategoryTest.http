@@ -25,3 +25,7 @@ Accept: application/json
 ### 모든 부모 조회
 GET http://localhost:10364/api/categories/parents?id=16
 Accept: application/json
+
+### 특정 카테고리의 모든 하위 카테고리 조회
+GET http://localhost:10364/api/categories/137/subcategories
+Accept: application/json

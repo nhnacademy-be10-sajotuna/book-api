@@ -3,7 +3,7 @@ POST http://localhost:10364/api/likes
 Content-Type: application/json
 X-User-Id: 1
 
-{ "bookIsbn": "4550621238154" }
+{ "bookIsbn": "9791193926277" }
 
 ###
 GET http://localhost:10364/api/likes/user

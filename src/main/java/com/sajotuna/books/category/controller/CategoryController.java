@@ -54,4 +54,11 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
+    
+    // 특정 카테고리의 모든 하위 카테고리 조회
+    @GetMapping("/{id}/subcategories")
+    public ResponseEntity<List<CategoryResponse>> getAllSubCategories(@PathVariable Long id) {
+        List<CategoryResponse> subCategories = categoryService.getAllSubCategories(id);
+        return ResponseEntity.ok(subCategories);
+    }
 }
