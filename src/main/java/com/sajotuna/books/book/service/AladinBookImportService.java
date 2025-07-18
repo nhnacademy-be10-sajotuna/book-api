@@ -54,6 +54,6 @@ public class AladinBookImportService {
                     .toList()
         );
 
-        aladinStockService.syncStockWithOrderApi(responses);
+        aladinStockService.syncStockWithOrderApi(books);
     }
 }
