@@ -24,7 +24,7 @@ public class AladinBookResponse {
     private String cover;
     private String publisher;
     private String categoryName;
-    private Integer stock;
+    private Integer stock = 100;
 
     public List<String> getCategoryNames() {
         if(categoryName == null || categoryName.isBlank()) {
