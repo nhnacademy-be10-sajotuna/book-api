@@ -19,7 +19,7 @@ GET http://localhost:10364/api/search?category=5&sort=newest&page=0&size=100
 Content-Type: application/json
 
 ###
-GET http://localhost:10364/api/books/9788970403014
+GET http://localhost:10364/api/books/9791193926277
 Content-Type: application/json
 
 ###
