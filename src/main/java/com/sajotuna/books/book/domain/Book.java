@@ -53,16 +53,6 @@ public class Book {
 
     private Integer likes; // 좋아요 수
 
-    @Column(nullable = false)//
-    private int viewCount;
-
-    private double averageRating;
-
-    private int reviewCount;
-
-    private int searchCount;
-
-    private double popularity;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookCategory> bookCategories = new HashSet<>();
@@ -87,10 +77,6 @@ public class Book {
         this.sellingPrice = sellingPrice;
         this.giftWrappingAvailable = giftWrappingAvailable;
         this.likes = likes;
-        this.viewCount = 0;
-        this.averageRating = 0.0;
-        this.reviewCount = 0;
-        this.popularity = 0.0;
     }
 
     // 할인율 계산 getter (DTO에 포함될 수 있음)
@@ -102,31 +88,6 @@ public class Book {
         return 0.0;
     }
 
-    public void incrementViewCount() {
-        this.viewCount++;
-    }
-
-    public void incrementReviewCount() {
-        this.reviewCount++;
-    }
-
-    public void calculateRating(double rating) {
-        log.info("Calculating rating :{}", rating);
-        log.info("Calculating rating :{}", averageRating);
-        log.info("Calculating rating :{}", reviewCount);
-        averageRating = ((averageRating * reviewCount) + rating) / (reviewCount + 1);
-        log.info("계산 결과 :{}", averageRating);
-        averageRating = Math.round(averageRating * 10.0) / 10.0;
-        log.info("최종 결과 :{}", averageRating);
-    }
-
-    public void incrementSearchCount() {
-        this.searchCount++;
-    }
-
-    public void calculatePopularity() {
-        this.popularity = viewCount * 0.7 + searchCount * 0.3;
-    }
 
     // 도서 정보 업데이트 메서드 (추가된 부분)
     public void updateInfo(BookCreateRequest request) {

@@ -2,6 +2,7 @@ package com.sajotuna.books.search.controller;
 
 import com.sajotuna.books.search.controller.reponse.BookSearchResponse;
 import com.sajotuna.books.search.service.BookSearchService;
+import com.sajotuna.books.search.service.BookStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.util.List;
 public class BookSearchController {
 
     private final BookSearchService bookSearchService;
+    private final BookStatsService bookStatsService;
 
     @GetMapping
     public Page<BookSearchResponse> search(
@@ -42,7 +44,6 @@ public class BookSearchController {
     public List<String> autoComplete(@RequestParam String keyword){
         return bookSearchService.autoCompleteTitle(keyword);
     }
-
 
 
 }

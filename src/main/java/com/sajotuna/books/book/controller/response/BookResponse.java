@@ -2,6 +2,8 @@ package com.sajotuna.books.book.controller.response;
 
 import com.sajotuna.books.category.controller.response.CategoryResponse;
 import com.sajotuna.books.book.domain.Book;
+import com.sajotuna.books.search.BookSearchDocument;
+import com.sajotuna.books.search.repository.BookSearchRepository;
 import com.sajotuna.books.tag.domain.BookTag;
 import com.sajotuna.books.tag.domain.Tag;
 import lombok.Getter;
@@ -50,9 +52,11 @@ public class BookResponse {
         this.discountRate = book.getDiscountRate();
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
-        this.averageRating = book.getAverageRating();
-        this.reviewCount = book.getReviewCount();
-        this.viewCount = book.getViewCount();
+        
+        // 기본값 설정 (ES 조회 실패 시)
+        this.averageRating = 0.0;
+        this.reviewCount = 0;
+        this.viewCount = 0;
 
         this.categories = extractCategoryPath(book);
 
@@ -60,8 +64,23 @@ public class BookResponse {
                 .map(BookTag::getTag)
                 .map(Tag::getTagName)
                 .collect(Collectors.toSet());
-
-
+    }
+    
+    // ES에서 통계 정보를 설정하는 생성자
+    public BookResponse(Book book, BookSearchRepository bookSearchRepository) {
+        this(book); // 기본 생성자 호출
+        
+        // ES에서 통계 조회
+        try {
+            BookSearchDocument stats = bookSearchRepository.findById(book.getIsbn()).orElse(null);
+            if (stats != null) {
+                this.averageRating = stats.getAverageRating();
+                this.reviewCount = stats.getReviewCount();
+                this.viewCount = stats.getViewCount();
+            }
+        } catch (Exception e) {
+            // ES 조회 실패 시 기본값 유지 (이미 설정됨)
+        }
     }
 
     private static List<List<CategoryResponse>> extractCategoryPath(Book book) {

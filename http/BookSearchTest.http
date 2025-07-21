@@ -11,11 +11,19 @@ GET http://localhost:10364/api/search?sort=newest&page=0&size=100
 Content-Type: application/json
 
 ### 키워드 검색
-GET http://localhost:10364/api/search?keyword=ㅎㅅㄹㅊㅊㅂㅇㄹ&sort=newest&page=0&size=100
+GET http://localhost:10364/api/search?keyword=ㅎㅇㄷㅂㄹㅋ&sort=newest&page=0&size=100
 Content-Type: application/json
 
 ### 카테고리 검색
 GET http://localhost:10364/api/search?category=5&sort=newest&page=0&size=100
 Content-Type: application/json
 
+###
+GET http://localhost:10364/api/books/9788970403014
+Content-Type: application/json
 
+###
+POST http://localhost:10364/api/books/9788970403014/review
+Content-Type: application/json
+
+1

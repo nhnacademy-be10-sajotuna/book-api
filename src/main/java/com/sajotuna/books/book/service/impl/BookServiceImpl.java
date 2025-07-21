@@ -12,6 +12,7 @@ import com.sajotuna.books.book.exception.BookNotFoundException; // 변경
 import com.sajotuna.books.book.repository.BookRepository;
 import com.sajotuna.books.search.BookSearchDocument;
 import com.sajotuna.books.search.repository.BookSearchRepository;
+import com.sajotuna.books.search.service.BookStatsService;
 import com.sajotuna.books.book.service.BookService;
 import com.sajotuna.books.category.domain.BookCategory;
 import com.sajotuna.books.category.domain.Category;
@@ -43,6 +44,7 @@ public class BookServiceImpl implements BookService {
     private final LikeRepository likeRepository; // LikeRepository 주입
     private final OrderStockClient orderStockClient;
     private final EntityManager entityManager;
+    private final BookStatsService bookStatsService;
 
     @Override
     public Page<BookResponse> getAllBooks(Pageable pageable) {
@@ -61,26 +63,38 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(isbn)
                 .orElseThrow(() -> new BookNotFoundException(isbn));
 
-        book.incrementViewCount();
-        book.calculatePopularity();
+        // ES에서 조회수 증가 + 실시간 인기도 재계산
+        bookStatsService.incrementViewCount(isbn);
 
-        bookRepository.save(book); //db 반영
-        bookSearchRepository.save(BookSearchDocument.from(book)); // Es 반영
-        return new BookResponse(book);
+        return new BookResponse(book, bookSearchRepository);
     }
 
     @Override
     public void updateReviewInfo(String isbn, double rating) {
+        // 책 존재 확인
         Book book = bookRepository.findById(isbn)
                 .orElseThrow(() -> new BookNotFoundException(isbn));
 
-        book.calculateRating(rating);
-        book.incrementReviewCount();
-
-        bookRepository.save(book); //  DB 반영
-
-        // Elasticsearch에도 반영
-        bookSearchRepository.save(BookSearchDocument.from(book));
+        // ES에서 현재 평점 정보 조회
+        BookSearchDocument bookDoc = bookSearchRepository.findById(isbn).orElse(null);
+        if (bookDoc == null) {
+            // ES에 문서가 없으면 기본값으로 생성
+            bookDoc = BookSearchDocument.from(book);
+            bookSearchRepository.save(bookDoc);
+        }
+        
+        // 평균 평점 계산: ((기존평균 * 기존리뷰수) + 새로운평점) / (기존리뷰수 + 1)
+        double currentAverage = bookDoc.getAverageRating();
+        int currentReviewCount = bookDoc.getReviewCount();
+        
+        double newAverageRating = ((currentAverage * currentReviewCount) + rating) / (currentReviewCount + 1);
+        int newReviewCount = currentReviewCount + 1;
+        
+        // 소수점 1자리로 반올림
+        newAverageRating = Math.round(newAverageRating * 10.0) / 10.0;
+        
+        // ES에서 평점/리뷰수 업데이트 (인기도 재계산 없음)
+        bookStatsService.updateReviewStats(isbn, newAverageRating, newReviewCount);
     }
 
 
