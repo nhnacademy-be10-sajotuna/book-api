@@ -65,8 +65,9 @@ public class BookServiceImpl implements BookService {
 
         // ES에서 조회수 증가 + 실시간 인기도 재계산
         bookStatsService.incrementViewCount(isbn);
+        BookSearchDocument bookSearchDocument = bookSearchRepository.findById(isbn).orElseThrow(() -> new BookNotFoundException(isbn));
 
-        return new BookResponse(book, bookSearchRepository);
+        return new BookResponse(book, bookSearchDocument);
     }
 
     @Override

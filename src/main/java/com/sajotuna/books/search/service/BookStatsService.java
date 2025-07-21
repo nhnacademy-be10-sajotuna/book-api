@@ -22,54 +22,36 @@ public class BookStatsService {
     
     // 메모리 버퍼 - 통계 업데이트 대기 중인 데이터
     private final Map<String, StatsDelta> pendingUpdates = new ConcurrentHashMap<>();
-    
-    /**
-     * 조회수 증가 + 실시간 인기도 재계산
-     */
+
     public void incrementViewCount(String isbn) {
         pendingUpdates.computeIfAbsent(isbn, k -> new StatsDelta())
                 .incrementViewCount();
-        
-        // 실시간 인기도 재계산
+
         recalculatePopularityAsync(isbn);
         
         log.debug("View count queued for ISBN: {}", isbn);
     }
-    
-    /**
-     * 검색횟수 증가 + 실시간 인기도 재계산
-     */
+
     public void incrementSearchCount(String isbn) {
         pendingUpdates.computeIfAbsent(isbn, k -> new StatsDelta())
                 .incrementSearchCount();
-        
-        // 실시간 인기도 재계산
+
         recalculatePopularityAsync(isbn);
         
         log.debug("Search count queued for ISBN: {}", isbn);
     }
-    
-    /**
-     * 검색횟수 배치 증가
-     */
+
     public void incrementSearchCounts(List<String> isbns) {
         isbns.forEach(this::incrementSearchCount);
     }
-    
-    /**
-     * 리뷰 통계 업데이트 (평균평점, 리뷰수) - 인기도 재계산 없음
-     */
+
     public void updateReviewStats(String isbn, double newAverageRating, int newReviewCount) {
         pendingUpdates.computeIfAbsent(isbn, k -> new StatsDelta())
                 .updateReviewStats(newAverageRating, newReviewCount);
         
         log.debug("Review stats queued for ISBN: {}", isbn);
     }
-    
-    /**
-     * 실시간 인기도 재계산
-     * 공식: 조회수 * 0.7 + 검색횟수 * 0.3
-     */
+
     private void recalculatePopularityAsync(String isbn) {
         try {
             // ES에서 현재 통계 조회
@@ -102,18 +84,14 @@ public class BookStatsService {
             log.error("Failed to recalculate popularity for ISBN {}: {}", isbn, e.getMessage());
         }
     }
-    
-    /**
-     * 인기도 계산 공식
-     * 조회수 * 0.7 + 검색횟수 * 0.3
-     */
+
+
     private double calculatePopularity(long viewCount, long searchCount) {
         return (viewCount * 0.7) + (searchCount * 0.3);
     }
-    
-    /**
-     * 30초마다 ES에 Bulk 업데이트
-     */
+
+     //30초마다 ES에 Bulk 업데이트
+
     @Scheduled(fixedDelay = 30000)
     public void flushPendingUpdates() {
         if (pendingUpdates.isEmpty()) {
@@ -134,10 +112,7 @@ public class BookStatsService {
             // 실패 시 버퍼 유지하여 다음 스케줄에서 재시도
         }
     }
-    
-    /**
-     * ES Bulk 업데이트 수행
-     */
+
     private void bulkUpdateStats() {
         log.info("Bulk updating {} documents", pendingUpdates.size());
         
@@ -152,7 +127,6 @@ public class BookStatsService {
             for (BookSearchDocument doc : documents) {
                 StatsDelta delta = pendingUpdates.get(doc.getIsbn());
                 if (delta != null) {
-                    // 통계 업데이트
                     if (delta.getViewCountDelta() > 0) {
                         doc.setViewCount(doc.getViewCount() + delta.getViewCountDelta());
                     }
@@ -186,9 +160,7 @@ public class BookStatsService {
     }
     
     
-    /**
-     * 통계 변화량을 저장하는 내부 클래스
-     */
+    // 통계 변화량을 저장
     @Getter
     public static class StatsDelta {
         // Getters

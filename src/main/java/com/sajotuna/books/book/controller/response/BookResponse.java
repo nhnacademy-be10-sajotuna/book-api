@@ -53,11 +53,6 @@ public class BookResponse {
         this.giftWrappingAvailable = book.getGiftWrappingAvailable();
         this.likes = book.getLikes();
         
-        // 기본값 설정 (ES 조회 실패 시)
-        this.averageRating = 0.0;
-        this.reviewCount = 0;
-        this.viewCount = 0;
-
         this.categories = extractCategoryPath(book);
 
         this.tags = book.getBookTags().stream()
@@ -65,22 +60,29 @@ public class BookResponse {
                 .map(Tag::getTagName)
                 .collect(Collectors.toSet());
     }
-    
-    // ES에서 통계 정보를 설정하는 생성자
-    public BookResponse(Book book, BookSearchRepository bookSearchRepository) {
-        this(book); // 기본 생성자 호출
-        
-        // ES에서 통계 조회
-        try {
-            BookSearchDocument stats = bookSearchRepository.findById(book.getIsbn()).orElse(null);
-            if (stats != null) {
-                this.averageRating = stats.getAverageRating();
-                this.reviewCount = stats.getReviewCount();
-                this.viewCount = stats.getViewCount();
-            }
-        } catch (Exception e) {
-            // ES 조회 실패 시 기본값 유지 (이미 설정됨)
-        }
+
+    public BookResponse(Book book, BookSearchDocument bookSearchDocument) {
+        this.isbn = book.getIsbn();
+        this.title = book.getTitle();
+        this.author = book.getAuthor();
+        this.publisher = book.getPublisher();
+        this.publicationDate = book.getPublicationDate();
+        this.pageCount = book.getPageCount();
+        this.imageUrl = book.getImageUrl();
+        this.description = book.getDescription();
+        this.sellingPrice = book.getSellingPrice();
+        this.originalPrice = book.getOriginalPrice();
+        this.discountRate = book.getDiscountRate();
+        this.giftWrappingAvailable = book.getGiftWrappingAvailable();
+        this.likes = book.getLikes();
+        this.categories = extractCategoryPath(book);
+        this.tags = book.getBookTags().stream()
+                .map(BookTag::getTag)
+                .map(Tag::getTagName)
+                .collect(Collectors.toSet());
+        this.averageRating = bookSearchDocument.getAverageRating();
+        this.reviewCount = bookSearchDocument.getReviewCount();
+        this.viewCount = bookSearchDocument.getViewCount();
     }
 
     private static List<List<CategoryResponse>> extractCategoryPath(Book book) {
@@ -91,6 +93,5 @@ public class BookResponse {
                         .toList())
                 .toList();
     }
-
 
 }

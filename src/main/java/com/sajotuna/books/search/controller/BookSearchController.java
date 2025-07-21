@@ -19,7 +19,6 @@ import java.util.List;
 public class BookSearchController {
 
     private final BookSearchService bookSearchService;
-    private final BookStatsService bookStatsService;
 
     @GetMapping
     public Page<BookSearchResponse> search(
@@ -31,19 +30,13 @@ public class BookSearchController {
         return bookSearchService.search(keyword,category,pageable.getPageNumber(),pageable.getPageSize(),sort,pageable);
     }
 
-//    @GetMapping("/categories")
-//    public Page<BookSearchResponse> searchByCategory(
-//            @RequestParam(required = false) String category,
-//            @RequestParam(defaultValue = "popularity") String sort,
-//            Pageable pageable
-//    ){
-//        return bookSearchService.searchByCategoryId(category,pageable.getPageNumber(),pageable.getPageSize(),sort,pageable);
-//    }
-
     @GetMapping("/autocomplete")
     public List<String> autoComplete(@RequestParam String keyword){
         return bookSearchService.autoCompleteTitle(keyword);
     }
 
-
+    @GetMapping("/isbn")
+    public BookSearchResponse searchByIsbn(@RequestParam String isbn){
+        return bookSearchService.searchByIsbn(isbn);
+    }
 }
