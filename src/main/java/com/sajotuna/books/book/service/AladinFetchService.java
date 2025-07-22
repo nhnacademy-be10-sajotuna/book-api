@@ -35,6 +35,7 @@ public class AladinFetchService {
                     .queryParam("SearchTarget", "All")
                     .queryParam("output", "JS")
                     .queryParam("Version", "20131101")
+                    .queryParam("Cover", "Big")
                     .build(false)
                     .toUriString();
 
