@@ -36,4 +36,7 @@ public interface BookService {
     void deleteBook(String isbn);
 
     List<BookSummaryResponse> getBooksByIsbns(BookBatchRequest request);
+    
+    // 좋아요 많은 순서로 책 조회 (메인 배너용)
+    Page<BookResponse> getBooksByLikesDesc(Pageable pageable);
 }

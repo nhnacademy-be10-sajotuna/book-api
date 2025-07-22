@@ -34,4 +34,11 @@ public class BookController {
         List<BookSummaryResponse> books = bookService.getBooksByIsbns(request);
         return ResponseEntity.ok(books);
     }
+
+    // 좋아요 많은 순서로 책 조회 (메인 배너용)
+    @GetMapping("/likes")
+    public ResponseEntity<Page<BookResponse>> getBooksByLikesDesc(Pageable pageable) {
+        Page<BookResponse> books = bookService.getBooksByLikesDesc(pageable);
+        return ResponseEntity.ok(books);
+    }
 }

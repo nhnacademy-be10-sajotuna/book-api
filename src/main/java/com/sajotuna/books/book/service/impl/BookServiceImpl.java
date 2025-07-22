@@ -261,4 +261,10 @@ public class BookServiceImpl implements BookService {
         Book updatedBook = bookRepository.save(book);
         return new BookResponse(updatedBook);
     }
+
+    @Override
+    public Page<BookResponse> getBooksByLikesDesc(Pageable pageable) {
+        return bookRepository.findAllByOrderByLikesDesc(pageable)
+                .map(BookResponse::new);
+    }
 }
