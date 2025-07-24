@@ -41,7 +41,6 @@ public class BookServiceImpl implements BookService {
     private final BookSearchRepository bookSearchRepository;
     private final CategoryService categoryService;
     private final TagService tagService;
-    private final LikeRepository likeRepository; // LikeRepository 주입
     private final OrderStockClient orderStockClient;
     private final EntityManager entityManager;
     private final BookStatsService bookStatsService;

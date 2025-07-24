@@ -5,6 +5,7 @@ import com.sajotuna.books.book.controller.response.ItemSearchResponse;
 import com.sajotuna.books.book.exception.ExternalApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,8 +20,11 @@ public class AladinFetchService {
 
     private final RestTemplate restTemplate;
 
-    private final String BASE_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
-    private final String TTB_KEY = "ttbdlguswn82541342001";
+    @Value("${aladin.url}")
+    private String BASE_URL;
+
+    @Value("${aladin.key}")
+    private String TTB_KEY;
 
     public List<AladinBookResponse> fetchBooks(String keyword, int totalPages) {
         List<AladinBookResponse> allBooks = new ArrayList<>();

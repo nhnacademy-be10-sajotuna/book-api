@@ -3,12 +3,15 @@ package com.sajotuna.books.book.service;
 import com.sajotuna.books.book.controller.response.AladinBookResponse;
 import com.sajotuna.books.book.controller.response.ItemSearchResponse;
 import com.sajotuna.books.book.exception.ExternalApiException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -20,6 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 class AladinFetchServiceTest {
 
     @Mock
@@ -27,6 +31,12 @@ class AladinFetchServiceTest {
 
     @InjectMocks
     private AladinFetchService aladinFetchService;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(aladinFetchService, "BASE_URL", "http://localhost:8080");
+        ReflectionTestUtils.setField(aladinFetchService, "TTB_KEY", "key");
+    }
 
     @Test
     @DisplayName("도서 검색 성공 - 단일 페이지")
