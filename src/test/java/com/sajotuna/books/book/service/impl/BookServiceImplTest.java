@@ -331,6 +331,127 @@ class BookServiceImplTest {
         );
     }
 
+
+    @Test
+    @DisplayName("ISBN 목록으로 도서 조회 성공")
+    void getBooksByIsbns_ShouldReturnBooks_WhenValidIsbns() {
+        // Given
+        List<String> isbns = List.of("9788960777330", "9788966262281");
+        List<Book> books = List.of(createTestBook(), createTestBook());
+        com.sajotuna.books.book.controller.request.BookBatchRequest request = 
+            new com.sajotuna.books.book.controller.request.BookBatchRequest(isbns);
+        
+        when(bookRepository.findAllById(isbns)).thenReturn(books);
+
+        // When
+        List<com.sajotuna.books.book.controller.response.BookSummaryResponse> result = bookService.getBooksByIsbns(request);
+
+        // Then
+        assertThat(result).hasSize(2);
+        verify(bookRepository).findAllById(isbns);
+    }
+
+    @Test
+    @DisplayName("빈 ISBN 목록 조회 시 예외 발생")
+    void getBooksByIsbns_ShouldThrowException_WhenEmptyResult() {
+        // Given
+        List<String> isbns = List.of("non-existent");
+        com.sajotuna.books.book.controller.request.BookBatchRequest request = 
+            new com.sajotuna.books.book.controller.request.BookBatchRequest(isbns);
+        
+        when(bookRepository.findAllById(isbns)).thenReturn(List.of());
+
+        // When & Then
+        assertThatThrownBy(() -> bookService.getBooksByIsbns(request))
+                .isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("ES 문서가 없을 때 리뷰 정보 업데이트")
+    void updateReviewInfo_ShouldCreateESDocument_WhenNotExists() {
+        // Given
+        String isbn = "9788960777330";
+        double rating = 4.5;
+        Book book = createTestBook();
+        
+        when(bookRepository.findById(isbn)).thenReturn(Optional.of(book));
+        when(bookSearchRepository.findById(isbn)).thenReturn(Optional.empty());
+
+        // When
+        bookService.updateReviewInfo(isbn, rating);
+
+        // Then
+        verify(bookSearchRepository).save(any(BookSearchDocument.class));
+        verify(bookStatsService).updateReviewStats(eq(isbn), anyDouble(), eq(1));
+    }
+
+    @Test
+    @DisplayName("카테고리 없이 도서 생성")
+    void createBook_ShouldCreateBook_WithoutCategories() {
+        // Given
+        BookCreateRequest request = createBookRequest();
+        request.setCategories(null);
+        Book book = createTestBook();
+        
+        when(bookRepository.existsById(request.getIsbn())).thenReturn(false);
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+
+        // When
+        BookResponse result = bookService.createBook(request);
+
+        // Then
+        assertThat(result.getIsbn()).isEqualTo(request.getIsbn());
+        verify(categoryService, never()).findAllByCategoryIds(any());
+    }
+
+    @Test
+    @DisplayName("태그 없이 도서 생성")
+    void createBook_ShouldCreateBook_WithoutTags() {
+        // Given
+        BookCreateRequest request = createBookRequest();
+        request.setTagNames(null);
+        Book book = createTestBook();
+        
+        when(bookRepository.existsById(request.getIsbn())).thenReturn(false);
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+
+        // When
+        BookResponse result = bookService.createBook(request);
+
+        // Then
+        assertThat(result.getIsbn()).isEqualTo(request.getIsbn());
+        verify(tagService, never()).findOrCreateTags(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 도서 삭제 시 예외 발생")
+    void deleteBook_ShouldThrowException_WhenBookNotExists() {
+        // Given
+        String isbn = "non-existent-isbn";
+        when(bookRepository.findById(isbn)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> bookService.deleteBook(isbn))
+                .isInstanceOf(BookNotFoundException.class);
+        verify(bookRepository, never()).delete(any(Book.class));
+    }
+
+    @Test
+    @DisplayName("ES 문서가 없는 책 조회 시 예외 발생")
+    void getBookByIsbn_ShouldThrowException_WhenESDocumentNotExists() {
+        // Given
+        String isbn = "9788960777330";
+        Book book = createTestBook();
+        
+        when(bookRepository.findById(isbn)).thenReturn(Optional.of(book));
+        when(bookSearchRepository.findById(isbn)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> bookService.getBookByIsbn(isbn))
+                .isInstanceOf(BookNotFoundException.class);
+        verify(bookStatsService).incrementViewCount(isbn);
+    }
+
     private BookCreateRequest createBookRequest() {
         BookCreateRequest request = new BookCreateRequest();
         request.setIsbn("9788960777330");
