@@ -40,6 +40,12 @@ public class AdminBookController {
         return new ResponseEntity<>(newBook, HttpStatus.CREATED);
     }
 
+    @GetMapping("/{isbn}")
+    public ResponseEntity<BookResponse> getBookByIsbn(@PathVariable String isbn) {
+        BookResponse book = bookService.getBookByIsbn(isbn);
+        return ResponseEntity.ok(book);
+    }
+
     // 기존 책 정보 수정 (관리자)
     @PutMapping("/{isbn}")
     public ResponseEntity<BookResponse> updateBook(@PathVariable String isbn, @Valid @RequestBody BookCreateRequest request) {
